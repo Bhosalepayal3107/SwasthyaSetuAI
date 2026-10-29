@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Create Your Account — SwasthyaSetu AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#f8fafc;
+            --surface:#ffffff;
+            --primary:#2563eb;
+            --primary-hover:#1d4ed8;
+            --primary-light:#eff6ff;
+            --navy:#1e3a8a;
+            --navy-dark:#0f172a;
+            --border:#e2e8f0;
+            --text:#0f172a;
+            --text-secondary:#475569;
+            --text-muted:#64748b;
+            --danger:#dc2626;
+            --shadow-lg:0 20px 35px -10px rgba(37,99,235,0.12),0 10px 10px -5px rgba(0,0,0,0.03);
+        }
+        body{
+            font-family:'Inter',system-ui,sans-serif;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:linear-gradient(135deg,#eff6ff 0%,#f8fafc 50%,#e0e7ff 100%);
+            color:var(--text);
+            padding:28px 16px;
+        }
+        .auth-container{
+            width:100%;
+            max-width:540px;
+        }
+        .auth-card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:20px;
+            padding:36px 32px;
+            box-shadow:var(--shadow-lg);
+        }
+        .auth-logo{
+            text-align:center;
+            margin-bottom:12px;
+        }
+        .auth-logo .icon{
+            width:52px;
+            height:52px;
+            background:var(--navy);
+            border-radius:15px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            color:#ffffff;
+            box-shadow:0 6px 18px rgba(30,58,138,0.22);
+        }
+        .auth-card h1{
+            text-align:center;
+            font-size:1.5rem;
+            font-weight:800;
+            color:var(--navy-dark);
+            font-family:'Manrope',sans-serif;
+            margin:12px 0 4px;
+        }
+        .auth-card .subtitle{
+            text-align:center;
+            font-size:.88rem;
+            color:var(--text-muted);
+            margin-bottom:24px;
+            line-height:1.45;
+        }
+        .form-row{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:14px;
+            margin-bottom:16px;
+        }
+        .form-row.full{
+            grid-template-columns:1fr;
+        }
+        .form-group{margin-bottom:0;}
+        .form-group label{
+            display:block;
+            font-size:.78rem;
+            font-weight:700;
+            color:var(--text-secondary);
+            margin-bottom:6px;
+            text-transform:uppercase;
+            letter-spacing:.4px;
+        }
+        .form-group label .required{color:var(--danger);margin-left:2px;}
+        .form-group input,.form-group select{
+            width:100%;
+            padding:11px 14px;
+            background:#ffffff;
+            border:1px solid var(--border);
+            border-radius:9px;
+            color:var(--text);
+            font-size:.92rem;
+            font-family:inherit;
+            transition:border-color .15s,box-shadow .15s;
+        }
+        .form-group input:focus,.form-group select:focus{
+            outline:none;
+            border-color:var(--primary);
+            box-shadow:0 0 0 3px rgba(37,99,235,0.14);
+        }
+        .form-group input::placeholder{color:#94a3b8;}
+        .form-group .help{
+            font-size:.74rem;
+            color:var(--text-muted);
+            margin-top:4px;
+        }
+        .privacy-box{
+            background:#eff6ff;
+            border:1px solid #bfdbfe;
+            border-radius:10px;
+            padding:12px 14px;
+            margin:18px 0;
+            font-size:.82rem;
+            color:#1e40af;
+            line-height:1.5;
+            display:flex;
+            gap:10px;
+            align-items:flex-start;
+        }
+        .privacy-box .p-icon{
+            font-size:16px;
+            flex-shrink:0;
+            margin-top:2px;
+        }
+        .submit-btn{
+            width:100%;
+            padding:13px;
+            background:var(--primary);
+            color:#ffffff;
+            border:none;
+            border-radius:10px;
+            font-size:.95rem;
+            font-weight:700;
+            cursor:pointer;
+            font-family:inherit;
+            transition:all .15s ease;
+            box-shadow:0 4px 14px rgba(37,99,235,0.3);
+        }
+        .submit-btn:hover{
+            background:var(--primary-hover);
+            transform:translateY(-1px);
+            box-shadow:0 6px 18px rgba(37,99,235,0.4);
+        }
+        .flash-msg{
+            padding:12px 16px;
+            border-radius:10px;
+            font-size:.86rem;
+            margin-bottom:18px;
+            font-weight:500;
+        }
+        .flash-msg.error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
+        .flash-msg.info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;}
+        .auth-footer{
+            margin-top:20px;
+            text-align:center;
+            font-size:.88rem;
+            color:var(--text-muted);
+        }
+        .auth-footer a{
+            color:var(--primary);
+            text-decoration:none;
+            font-weight:600;
+        }
+        .auth-footer a:hover{text-decoration:underline;}
+
+        @media(max-width:540px){
+            .form-row{grid-template-columns:1fr;}
+            .auth-card{padding:26px 20px;}
+        }
+
+        /* Language Switcher */
+        .lang-picker-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ffffff;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 4px 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            transition: all 0.2s;
+        }
+        .lang-picker-box:hover {
+            border-color: var(--primary);
+        }
+        .lang-globe { font-size: 13px; line-height: 1; }
+        .portal-lang-select {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--navy);
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .portal-lang-select option {
+            font-weight: 600;
+            color: #0f172a;
+            background: #ffffff;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+            <div class="lang-picker-box" title="Select Language / भाषा निवडा / भाषा चुनें">
+                <span class="lang-globe">🌐</span>
+                <select class="portal-lang-select" onchange="changePortalLanguage(this.value)" aria-label="Select Language">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="auth-logo"><div class="icon">✚</div></div>
+        <h1 data-i18n="reg.title">Create Account</h1>
+        <p class="subtitle" data-i18n="reg.sub">Join SwasthyaSetu to find government healthcare schemes</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for cat, msg in messages %}
+        <div class="flash-msg {{ cat }}">{{ msg }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <!-- Full Name -->
+            <div class="form-row full">
+                <div class="form-group">
+                    <label data-i18n="reg.name_lbl">Full Name <span class="required">*</span></label>
+                    <input type="text" name="name" required placeholder="e.g. Ramesh Patil"
+                           value="{{ request.form.get('name', '') }}" autofocus>
+                </div>
+            </div>
+
+            <!-- Email & Mobile -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label data-i18n="reg.email_lbl">Email Address <span class="required">*</span></label>
+                    <input type="email" name="email" required placeholder="ramesh@example.com"
+                           value="{{ request.form.get('email', '') }}">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="reg.mobile_lbl">Mobile Number <small style="color:var(--text-muted);text-transform:none;">(Optional)</small></label>
+                    <input type="tel" name="mobile" placeholder="10-digit mobile"
+                           value="{{ request.form.get('mobile', '') }}">
+                </div>
+            </div>
+
+            <!-- Location (State & District) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label data-i18n="reg.state_lbl">State <span class="required">*</span></label>
+                    <select name="state" required>
+                        <option value="">Select your State</option>
+                        {% set states_list = [
+                            "Maharashtra", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
+                            "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh",
+                            "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Manipur",
+                            "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+                            "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+                            "Uttar Pradesh", "Uttarakhand", "West Bengal",
+                            "Delhi (NCT)", "Jammu and Kashmir", "Ladakh", "Chandigarh",
+                            "Puducherry", "Andaman and Nicobar Islands",
+                            "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep"
+                        ] %}
+                        {% for st in states_list %}
+                        <option value="{{ st }}" {% if request.form.get('state') == st or (not request.form.get('state') and st == 'Maharashtra') %}selected{% endif %}>
+                            {{ st }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="reg.district_lbl">District <span class="required">*</span></label>
+                    <input type="text" name="district" required placeholder="e.g. Pune / Mumbai"
+                           value="{{ request.form.get('district', '') }}">
+                </div>
+            </div>
+
+            <!-- Password & Confirm Password -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label data-i18n="reg.pwd_lbl">Password <span class="required">*</span></label>
+                    <input type="password" name="password" required minlength="6" placeholder="At least 6 characters">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="reg.confirm_lbl">Confirm Password <span class="required">*</span></label>
+                    <input type="password" name="confirm_password" required minlength="6" placeholder="Repeat password">
+                </div>
+            </div>
+
+            <div class="privacy-box">
+                <span class="p-icon">🔒</span>
+                <div>
+                    <strong>Privacy First:</strong> We do not ask for your Aadhaar number, ration card details, bank info, or medical records during registration. You can explore schemes immediately with just your basic location.
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" data-i18n="reg.btn">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+            <span data-i18n="reg.have_account">Already have an account?</span> <a href="{{ url_for('login') }}" data-i18n="reg.login_link">Login here</a>
+            <div style="margin-top:14px;">
+                <a href="/" style="font-size:0.82rem;color:var(--text-muted);" data-i18n="login.back">← Back to Public Portal</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Language Switcher (Native, No Google Translate) -->
+<script src="{{ url_for('static', filename='language_switcher.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">YOUR PERSONALIZED RESULTS</p>
+    <h1>Your Healthcare Support Recommendations</h1>
+    <p class="subheading">Based on the information you provided, these government programmes may be relevant to your needs.</p>
+  </div>
+  <div class="heading-actions no-print">
+    <button type="button" class="btn btn-outline btn-sm" onclick="window.print();">🖨️ Print / Save Summary</button>
+    <a href="{{ url_for('schemes_reset') }}" class="btn btn-outline btn-sm">↺ Start Again</a>
+  </div>
+</div>
+
+<!-- Prominent Mandatory Statutory Disclaimer -->
+<div class="disclaimer-banner">
+  <span class="disclaimer-icon">⚖️</span>
+  <div>
+    <b>Official Disclaimer:</b>
+    <p>These are preliminary recommendations, not an official eligibility decision or guarantee of financial assistance. Final eligibility, covered treatments, participating hospitals and benefits must be confirmed with the relevant government authority.</p>
+  </div>
+</div>
+
+<!-- Emergency Alert Bar if Emergency was selected -->
+{% if profile.get('treatment_status') == 'Emergency treatment required now' %}
+<div class="emergency-bar">
+  <span class="em-badge">🚨 URGENT EMERGENCY NOTICE</span>
+  <div class="em-bar-content">
+    <b>Immediate medical emergency flagged:</b>
+    <p>Do not wait for paperwork or online approvals. Call <strong>112</strong> or <strong>108</strong> immediately, or proceed to the nearest emergency hospital. All hospitals are mandated to initiate emergency life-saving stabilization care.</p>
+  </div>
+  <a href="tel:112" class="btn btn-emergency-solid btn-sm">Call 112</a>
+</div>
+{% endif %}
+
+<!-- Applicant Profile Snapshot -->
+<div class="profile-snapshot-panel no-print">
+  <div class="snapshot-header">
+    <div>
+      <span class="snapshot-tag">PROFILE EVALUATED</span>
+      <h3>{{ profile.get('full_name', 'Applicant') }}</h3>
+      <p>
+        Beneficiary: <b>{{ profile.get('beneficiary', 'myself')|capitalize }}</b> 
+        {% if profile.get('patient_age') and profile.get('beneficiary') != 'myself' %}
+          (Patient Age: <b>{{ profile.get('patient_age') }} yrs</b>)
+        {% else %}
+          (Age: <b>{{ profile.get('age', '—') }} yrs</b>)
+        {% endif %}
+        · Location: <b>{{ profile.get('district', 'District') }}, {{ profile.get('state', 'State') }}</b> ({{ profile.get('residence_type', 'Rural') }})
+        · Income: <b>{{ profile.get('income', 'Not specified') }}</b>
+      </p>
+    </div>
+    <div class="snapshot-actions">
+      <a href="{{ url_for('schemes', step=1) }}" class="btn btn-outline btn-sm">✏️ Edit Answers</a>
+    </div>
+  </div>
+  <div class="snapshot-pills">
+    <span class="info-pill">Care: {{ profile.get('treatments', ['General care'])|join(', ') }}</span>
+    <span class="info-pill">Status: {{ profile.get('treatment_status', 'Consultation') }}</span>
+    <span class="info-pill">Facility: {{ profile.get('hospital_type', 'Hospital') }}</span>
+    {% if profile.get('ration_card') == 'yes' %}
+    <span class="info-pill">Ration Card: {{ profile.get('ration_card_type', 'Yes') }}</span>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Recommendations List / Cards -->
+{% if recommendations %}
+<div class="results-meta">
+  <h2>Recommended Government Healthcare Schemes ({{ recommendations|length }})</h2>
+  <p class="muted">Ordered by relevance to your medical needs, state jurisdiction, and household criteria.</p>
+</div>
+
+<div class="scheme-results-grid">
+  {% for scheme in recommendations %}
+  <article class="scheme-result-card" id="scheme-card-{{ scheme.id }}">
+    <div class="result-card-header">
+      <div class="card-title-group">
+        <div class="scheme-symbol blue">✚</div>
+        <div>
+          <div class="badges-row">
+            <span class="tag">{{ scheme.tag }}</span>
+            <span class="gov-level-badge {{ 'state' if 'Maharashtra' in scheme.govt_level else 'central' }}">
+              {{ scheme.govt_level }}
+            </span>
+            <span class="category-badge">{{ scheme.category }}</span>
+          </div>
+          <h2 class="scheme-card-title">{{ scheme.name }}</h2>
+        </div>
+      </div>
+      <div class="relevance-badge">
+        <span class="score-label">Relevance Index</span>
+        <span class="score-val">{{ scheme.relevance_score }}/100</span>
+      </div>
+    </div>
+
+    <p class="scheme-desc">{{ scheme.description }}</p>
+
+    <!-- Why this scheme matches -->
+    <div class="match-reasons-block">
+      <div class="block-title">
+        <span class="block-icon">✓</span>
+        <b>Why this scheme matches your answers</b>
+      </div>
+      <ul class="reason-list">
+        {% for reason in scheme.match_reasons %}
+        <li>{{ reason }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Verified Potential Benefits / Beneficiaries -->
+    {% if scheme.benefit_info or scheme.intended_beneficiaries %}
+    <div class="benefits-block">
+      <div class="block-title">
+        <span class="block-icon">🎁</span>
+        <b>Verified Scheme Scope & Benefits</b>
+      </div>
+      <p class="benefit-highlight">{{ scheme.benefit_info or scheme.description }}</p>
+      {% if scheme.intended_beneficiaries %}
+      <small class="benefit-details">Target Group: {{ scheme.intended_beneficiaries }}</small>
+      {% elif scheme.covered_treatment %}
+      <small class="benefit-details">{{ scheme.covered_treatment }}</small>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Eligibility Conditions to Verify -->
+    <div class="verification-block">
+      <div class="block-title">
+        <span class="block-icon">🔍</span>
+        <b>Conditions to officially verify</b>
+      </div>
+      <ul class="verification-list">
+        {% for cond in scheme.verification_needed %}
+        <li>{{ cond }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Document Readiness Summary -->
+    <div class="docs-summary-row">
+      <span class="docs-badge">
+        📑 Documents Ready: <strong>{{ scheme.docs_ready_count }} / {{ scheme.docs_total_count }}</strong>
+      </span>
+      <span class="verification-source">
+        Source: {{ scheme.source_of_rules }} (Verified {{ scheme.last_verified_date }})
+      </span>
+    </div>
+
+    <!-- Card Action Buttons -->
+    <div class="result-card-actions no-print">
+      <button type="button" class="btn btn-outline btn-sm open-modal-btn" data-modal="modal-why-{{ scheme.id }}">
+        Why this scheme? ℹ️
+      </button>
+      <button type="button" class="btn btn-outline btn-sm open-modal-btn" data-modal="modal-docs-{{ scheme.id }}">
+        View Required Documents 📑
+      </button>
+      <a href="{{ scheme.official_website }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+        Check Official Eligibility ↗
+      </a>
+      <a href="{{ scheme.official_website }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+        Visit Official Website ↗
+      </a>
+    </div>
+
+    <!-- Interactive Modal: Deep Explanation ("Why this scheme?") -->
+    <div id="modal-why-{{ scheme.id }}" class="custom-modal-backdrop" style="display: none;" role="dialog" aria-hidden="true">
+      <div class="custom-modal-content">
+        <div class="modal-head">
+          <h3>Why {{ scheme.name }} matches your profile</h3>
+          <button type="button" class="close-modal-btn" data-close="modal-why-{{ scheme.id }}">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-section">
+            <h4>Rule-Based Matching Logic:</h4>
+            <ul>
+              {% for r in scheme.match_reasons %}
+              <li><strong>Matched Factor:</strong> {{ r }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="modal-section">
+            <h4>Intended Beneficiaries:</h4>
+            <p>{{ scheme.intended_beneficiaries }}</p>
+          </div>
+          <div class="modal-section">
+            <h4>Verified Statutory Eligibility Conditions:</h4>
+            <ul>
+              {% for c in scheme.verified_eligibility_conditions %}
+              <li>{{ c }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="modal-section">
+            <h4>Official Application Method:</h4>
+            <p>{{ scheme.application_process }}</p>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <a href="{{ scheme.official_website }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Open Official Portal ↗</a>
+          <button type="button" class="btn btn-outline btn-sm close-modal-btn" data-close="modal-why-{{ scheme.id }}">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive Modal: Required Documents Checklist -->
+    <div id="modal-docs-{{ scheme.id }}" class="custom-modal-backdrop" style="display: none;" role="dialog" aria-hidden="true">
+      <div class="custom-modal-content">
+        <div class="modal-head">
+          <h3>Required Documents: {{ scheme.tag }}</h3>
+          <button type="button" class="close-modal-btn" data-close="modal-docs-{{ scheme.id }}">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="muted">Compare what you have available with the official checklist for this scheme:</p>
+          <div class="modal-doc-list">
+            {% for d in scheme.doc_status_details %}
+            <div class="modal-doc-row">
+              <span class="doc-name">{{ d.name }}</span>
+              <span class="doc-status-tag {{ 'ready' if 'Available' in d.status else 'pending' }}">{{ d.status }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="modal-notice">
+            <b>Note on Document Verification:</b>
+            <p>Do not be discouraged if a document is listed as pending. Most empanelled hospitals have dedicated 'Ayushman Mitra' or 'Arogyamitra' helpdesks that can assist with on-the-spot biometric verification or family ID lookup using just your Aadhaar or Ration Card number.</p>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <a href="{{ scheme.official_website }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">View Official Guidelines ↗</a>
+          <button type="button" class="btn btn-outline btn-sm close-modal-btn" data-close="modal-docs-{{ scheme.id }}">Close</button>
+        </div>
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+
+<!-- Print-Only Official Footer -->
+<div class="print-only print-footer">
+  <p><strong>SwasthyaSetu AI Healthcare Scheme Recommendation Report</strong></p>
+  <p>Report generated for: {{ profile.get('full_name') }} · District: {{ profile.get('district') }}, {{ profile.get('state') }}</p>
+  <p>Disclaimer: Preliminary recommendations only. Final eligibility must be confirmed with the respective government authority or empanelled hospital.</p>
+</div>
+
+{% else %}
+<!-- Exact required empty-state message if no schemes matched -->
+<div class="empty-state panel">
+  <span class="empty-icon">🏛️</span>
+  <h3>No Direct Scheme Matches Identified</h3>
+  <p class="empty-highlight-text">
+    We could not identify a suitable match from the information provided. This does not mean you are ineligible for government assistance. Please check the official scheme directory or contact an authorized healthcare support centre.
+  </p>
+  <div class="empty-actions">
+    <a href="{{ url_for('schemes_reset') }}" class="btn btn-primary">Start Questionnaire Again</a>
+    <a href="https://www.myscheme.gov.in/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Browse All Schemes on myScheme.gov.in ↗</a>
+  </div>
+</div>
+{% endif %}
+
+<!-- Bottom Navigation Actions -->
+<div class="results-bottom-bar no-print">
+  <a href="{{ url_for('schemes_reset') }}" class="btn btn-outline">↺ Start Over with New Profile</a>
+  <a href="{{ url_for('hospitals') }}" class="btn btn-outline">✚ Find Nearby Hospitals</a>
+  <a href="{{ url_for('assistant') }}" class="btn btn-primary">Ask AI Assistant About Schemes →</a>
+</div>
+{% endblock %}

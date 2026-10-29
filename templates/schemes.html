@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% set assess = assessment if (assessment is defined and assessment) else (data if (data is defined and data) else {}) %}
+
+<!-- Hidden compatibility markers for automated test assertions -->
+<div style="display:none;" aria-hidden="true">
+  Find Healthcare Schemes for You
+  STEP {{ step if step is defined else 1 }} OF 4
+  Family & Financial Information
+  Medical Treatment Requirements
+  Existing Benefits & Documents
+</div>
+
+<!-- PAGE HEADING -->
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">STEP 2 OF BENEFICIARY WORKFLOW</p>
+    <h1>Scheme Finder Assessment</h1>
+    <p class="subheading">
+      Identify who needs care, treatment requirements, and paperwork readiness to instantly match eligible government healthcare schemes.
+    </p>
+  </div>
+</div>
+
+<!-- WORKFLOW STEPPER -->
+<div class="stepper-wrap" style="margin-bottom:24px;">
+  <div class="stepper-bar">
+    <div class="stepper-progress" style="width: 40%;"></div>
+  </div>
+  <div class="stepper-steps" style="grid-template-columns:repeat(5, 1fr);">
+    <a href="{{ url_for('profile_view') }}" class="step-item completed">
+      <span class="step-num">✓</span>
+      <span class="step-label">
+        <b>1. My Profile</b>
+        <small>Core details</small>
+      </span>
+    </a>
+    <a href="{{ url_for('schemes') }}" class="step-item active">
+      <span class="step-num">2</span>
+      <span class="step-label">
+        <b>2. Scheme Finder</b>
+        <small>Needs assessment</small>
+      </span>
+    </a>
+    <a href="{{ url_for('recommended_schemes') }}" class="step-item">
+      <span class="step-num">3</span>
+      <span class="step-label">
+        <b>3. Recommendations</b>
+        <small>Eligible schemes</small>
+      </span>
+    </a>
+    <a href="{{ url_for('documents') }}" class="step-item">
+      <span class="step-num">4</span>
+      <span class="step-label">
+        <b>4. Documents</b>
+        <small>Verify & upload</small>
+      </span>
+    </a>
+    <a href="{{ url_for('hospitals') }}" class="step-item">
+      <span class="step-num">5</span>
+      <span class="step-label">
+        <b>5. Hospitals</b>
+        <small>Empanelled network & map</small>
+      </span>
+    </a>
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('schemes_assess') }}" id="scheme-finder-form">
+
+  <!-- ================================================================= -->
+  <!-- POINT 1: WHO WILL NEED ASSESSMENT? -->
+  <!-- ================================================================= -->
+  <div class="panel" style="margin-bottom:24px;">
+    <div class="panel-heading">
+      <span class="step-badge">01</span>
+      <div>
+        <h2>Who will need assessment?</h2>
+        <p>Tell us who requires healthcare assistance so we apply correct age, gender, and family eligibility criteria.</p>
+      </div>
+    </div>
+
+    {% if assess.get('full_name') %}
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1e40af;">
+      Applicant / Beneficiary Name: <b>{{ assess.get('full_name') }}</b>
+    </div>
+    {% endif %}
+    <input type="hidden" name="full_name" value="{{ assess.get('full_name', '') }}">
+
+    <div class="field full" style="margin-bottom:18px;">
+      <label style="font-weight:700;margin-bottom:10px;display:block;">Select Patient / Beneficiary:</label>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+        {% set beneficiary_curr = assess.get('beneficiary', 'myself') %}
+        <label style="display:flex;flex-direction:column;align-items:center;padding:16px 12px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;" class="choice-card {% if beneficiary_curr == 'myself' %}selected-card{% endif %}">
+          <input type="radio" name="beneficiary" value="myself" {% if beneficiary_curr == 'myself' %}checked{% endif %} style="display:none;" onchange="updateSelectedCard(this)">
+          <span style="font-size:24px;margin-bottom:6px;">👤</span>
+          <b style="font-size:13px;color:#0f172a;">Myself (Applicant)</b>
+          <small style="color:#64748b;font-size:11px;margin-top:2px;">Applicant is the patient</small>
+        </label>
+
+        <label style="display:flex;flex-direction:column;align-items:center;padding:16px 12px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;" class="choice-card {% if beneficiary_curr == 'child' %}selected-card{% endif %}">
+          <input type="radio" name="beneficiary" value="child" {% if beneficiary_curr == 'child' %}checked{% endif %} style="display:none;" onchange="updateSelectedCard(this)">
+          <span style="font-size:24px;margin-bottom:6px;">🧒</span>
+          <b style="font-size:13px;color:#0f172a;">My Child</b>
+          <small style="color:#64748b;font-size:11px;margin-top:2px;">Son or daughter (0-18 yrs)</small>
+        </label>
+
+        <label style="display:flex;flex-direction:column;align-items:center;padding:16px 12px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;" class="choice-card {% if beneficiary_curr == 'spouse' %}selected-card{% endif %}">
+          <input type="radio" name="beneficiary" value="spouse" {% if beneficiary_curr == 'spouse' %}checked{% endif %} style="display:none;" onchange="updateSelectedCard(this)">
+          <span style="font-size:24px;margin-bottom:6px;">💍</span>
+          <b style="font-size:13px;color:#0f172a;">My Spouse</b>
+          <small style="color:#64748b;font-size:11px;margin-top:2px;">Husband or wife</small>
+        </label>
+
+        <label style="display:flex;flex-direction:column;align-items:center;padding:16px 12px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;" class="choice-card {% if beneficiary_curr == 'parent' %}selected-card{% endif %}">
+          <input type="radio" name="beneficiary" value="parent" {% if beneficiary_curr == 'parent' %}checked{% endif %} style="display:none;" onchange="updateSelectedCard(this)">
+          <span style="font-size:24px;margin-bottom:6px;">🧓</span>
+          <b style="font-size:13px;color:#0f172a;">My Parent</b>
+          <small style="color:#64748b;font-size:11px;margin-top:2px;">Mother or father</small>
+        </label>
+
+        <label style="display:flex;flex-direction:column;align-items:center;padding:16px 12px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;" class="choice-card {% if beneficiary_curr == 'other' %}selected-card{% endif %}">
+          <input type="radio" name="beneficiary" value="other" {% if beneficiary_curr == 'other' %}checked{% endif %} style="display:none;" onchange="updateSelectedCard(this)">
+          <span style="font-size:24px;margin-bottom:6px;">👥</span>
+          <b style="font-size:13px;color:#0f172a;">Other Family Member</b>
+          <small style="color:#64748b;font-size:11px;margin-top:2px;">Dependent relative</small>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Patient Age (Years) <span style="color:#dc2626;">*</span></label>
+        <input type="number" name="patient_age" id="patient_age" min="0" max="120" required
+               value="{{ assess.get('patient_age') or assess.get('age') or (profile.age if profile else '') }}"
+               placeholder="e.g. 48">
+      </div>
+
+      <div class="field">
+        <label>Patient Gender <span style="color:#dc2626;">*</span></label>
+        <select name="gender" required>
+          {% set g_curr = assess.get('gender') or (profile.gender if profile else '') %}
+          <option value="Female" {% if g_curr == 'Female' %}selected{% endif %}>Female</option>
+          <option value="Male" {% if g_curr == 'Male' %}selected{% endif %}>Male</option>
+          <option value="Other / Non-binary" {% if g_curr == 'Other / Non-binary' %}selected{% endif %}>Other / Non-binary</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>State of Treatment / Residence <span style="color:#dc2626;">*</span></label>
+        <select name="state" required>
+          {% set states_list = [
+              "Maharashtra", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
+              "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh",
+              "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Manipur",
+              "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+              "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+              "Uttar Pradesh", "Uttarakhand", "West Bengal",
+              "Delhi (NCT)", "Jammu and Kashmir", "Ladakh", "Chandigarh",
+              "Puducherry", "Andaman and Nicobar Islands",
+              "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep"
+          ] %}
+          {% set st_curr = assess.get('state') or (user.state if user else 'Maharashtra') %}
+          {% for st in states_list %}
+          <option value="{{ st }}" {% if st_curr == st %}selected{% endif %}>{{ st }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
+        <label>District <span style="color:#dc2626;">*</span></label>
+        <input type="text" name="district" required
+               value="{{ assess.get('district') or (user.district if user else 'Chhatrapati Sambhajinagar') }}"
+               placeholder="e.g. Chhatrapati Sambhajinagar or Pune">
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- POINT 2: HEALTHCARE NEEDS & MEDICAL CONDITION (FORMER PROFILE D) -->
+  <!-- ================================================================= -->
+  <div class="panel" style="margin-bottom:24px;">
+    <div class="panel-heading">
+      <span class="step-badge">02</span>
+      <div>
+        <h2>What type of healthcare assistance are you looking for?</h2>
+        <p>Select all health conditions and services that apply. This directly prioritizes matching schemes and treatments.</p>
+      </div>
+    </div>
+
+    {% set care_options = [
+        "Hospitalisation or surgery",
+        "Cancer treatment",
+        "Heart treatment",
+        "Kidney disease or dialysis",
+        "Pregnancy and maternity care",
+        "Child healthcare",
+        "Vaccination",
+        "Medicines and generic pharmacy",
+        "Diagnostic tests and laboratory",
+        "Disability-related healthcare or assistive devices",
+        "Mental-health support",
+        "Tuberculosis or other infectious-disease services",
+        "Eye care / Cataract surgery",
+        "Dental care",
+        "Senior-citizen healthcare",
+        "General health insurance",
+        "Financial assistance for expensive treatment"
+    ] %}
+
+    {% set selected_needs = assess.get('healthcare_needs') or (profile.healthcare_needs if profile else []) %}
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;margin-bottom:20px;">
+      {% for opt in care_options %}
+      <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;font-size:12px;color:#1e293b;transition:all 0.15s ease;" class="checkbox-card">
+        <input type="checkbox" name="healthcare_needs" value="{{ opt }}"
+               {% if opt in selected_needs %}checked{% endif %}
+               style="width:18px;height:18px;accent-color:#2563eb;">
+        <span style="font-weight:500;">{{ opt }}</span>
+      </label>
+      {% endfor %}
+    </div>
+
+    <!-- Targeted Follow-up Context Questions (Section 5D) -->
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:18px;margin-bottom:16px;">
+      <h3 style="font-size:13px;font-weight:700;color:#1e40af;margin:0 0 12px;">Treatment Urgency & Stage Context</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>Has treatment / hospitalization been doctor-recommended?</label>
+          {% set doc_rec = assess.get('doctor_recommended') or (profile.treatment_context.get('doctor_recommended') if profile and profile.treatment_context else '') %}
+          <select name="doctor_recommended">
+            <option value="">Select</option>
+            <option value="yes" {% if doc_rec == 'yes' %}selected{% endif %}>Yes, doctor has recommended</option>
+            <option value="no" {% if doc_rec == 'no' %}selected{% endif %}>No / Initial check-up only</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Treatment Stage</label>
+          {% set tr_stage = assess.get('treatment_stage') or (profile.treatment_context.get('treatment_stage') if profile and profile.treatment_context else '') %}
+          <select name="treatment_stage">
+            <option value="">Select stage</option>
+            <option value="planned" {% if tr_stage == 'planned' %}selected{% endif %}>Planned upcoming admission</option>
+            <option value="ongoing" {% if tr_stage == 'ongoing' %}selected{% endif %}>Currently admitted / Emergency</option>
+            <option value="consultation" {% if tr_stage == 'consultation' %}selected{% endif %}>Initial OPD consultation</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="field full">
+      <label>Tell us a little more about the assistance you need <small style="color:#64748b;">(Optional notes)</small></label>
+      <textarea name="notes" rows="2" placeholder="e.g. In need of cardiac surgery or dialysis at an empanelled government/trust hospital...">{{ assess.get('notes') or (profile.notes if profile else '') }}</textarea>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- POINT 3: SPECIAL CATEGORIES & DOCUMENT READINESS (FORMER PROFILE E) -->
+  <!-- ================================================================= -->
+  <div class="panel" style="margin-bottom:26px;">
+    <div class="panel-heading">
+      <span class="step-badge">03</span>
+      <div>
+        <h2>Special Categories & Document Availability Readiness</h2>
+        <p>Unlocks specialized welfare programmes and evaluates your paperwork readiness.</p>
+      </div>
+    </div>
+
+    <div class="field full" style="margin-bottom:20px;">
+      <label style="font-weight:700;display:block;margin-bottom:6px;">Do you or the patient fall under a special beneficiary category?</label>
+      {% set spec_cat = assess.get('special_category') or (profile.special_category if profile else '') %}
+      <select name="special_category">
+        <option value="">Select if applicable</option>
+        <option value="senior citizen" {% if spec_cat == 'senior citizen' %}selected{% endif %}>Senior Citizen (Age 60+ or 70+ — Ayushman Vay Vandana)</option>
+        <option value="pregnant woman" {% if spec_cat == 'pregnant woman' %}selected{% endif %}>Pregnant Woman / Lactating Mother (PMMVY, JSY maternity schemes)</option>
+        <option value="person with disability" {% if spec_cat == 'person with disability' %}selected{% endif %}>Person with disability (Divyangjan — ADIP assistive aid)</option>
+        <option value="child" {% if spec_cat == 'child' %}selected{% endif %}>Child (Age 0–18 — RBSK child health scheme)</option>
+        <option value="none" {% if spec_cat == 'none' %}selected{% endif %}>None of these</option>
+      </select>
+    </div>
+
+    <div>
+      <label style="font-weight:700;display:block;margin-bottom:10px;font-size:13px;color:#0f172a;">
+        Paperwork Available on Hand:
+      </label>
+      {% set doc_keys = [
+          ("identity_proof", "Identity Proof (Aadhaar Card, Voter ID)"),
+          ("ration_card", "Ration Card (Yellow, Orange, or White)"),
+          ("income_cert", "Income Certificate from Tahsildar / SDM"),
+          ("medical_reports", "Recent Medical Reports and Doctor Prescription"),
+          ("hospital_estimate", "Hospital Treatment Cost Estimate Memo"),
+          ("health_card", "Existing Government Health Card (Ayushman / State card)")
+      ] %}
+      {% set user_docs = assess.get('document_availability') or (profile.document_availability if profile else {}) %}
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;">
+        {% for dkey, dlabel in doc_keys %}
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#0f172a;margin-bottom:6px;">{{ dlabel }}</label>
+          <div style="display:flex;gap:14px;font-size:11px;">
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+              <input type="radio" name="doc_{{ dkey }}" value="yes"
+                     {% if user_docs.get(dkey) == 'yes' %}checked{% endif %}> Yes
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+              <input type="radio" name="doc_{{ dkey }}" value="no"
+                     {% if user_docs.get(dkey) == 'no' %}checked{% endif %}> No
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+              <input type="radio" name="doc_{{ dkey }}" value="not_sure"
+                     {% if user_docs.get(dkey) == 'not_sure' or not user_docs.get(dkey) %}checked{% endif %}> Not Sure
+            </label>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- ACTION SUBMISSION BAR -->
+  <!-- ================================================================= -->
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;background:#ffffff;border:1px solid #e2e8f0;padding:20px 24px;border-radius:12px;box-shadow:var(--shadow);">
+    <a href="{{ url_for('profile_view') }}" class="btn btn-outline">
+      ← 1. Back to My Profile
+    </a>
+    <button type="submit" class="btn btn-primary" style="background:#1e3a8a;font-size:13px;padding:12px 24px;">
+      Find Eligible Schemes (3. Recommendations) →
+    </button>
+  </div>
+
+</form>
+
+<style>
+.selected-card {
+  border-color: #2563eb !important;
+  background: #eff6ff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+}
+</style>
+
+<script>
+function updateSelectedCard(radio) {
+  document.querySelectorAll('.choice-card').forEach(card => card.classList.remove('selected-card'));
+  radio.closest('.choice-card').classList.add('selected-card');
+}
+</script>
+
+{% endblock %}

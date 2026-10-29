@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Leaflet CSS & JS for Interactive Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<!-- PAGE HEADING -->
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">HOSPITAL FINDER · STEP 5 OF BENEFICIARY WORKFLOW</p>
+    <h1>Empanelled Hospitals & Network Centers</h1>
+    <p class="subheading">
+      Find accredited network hospitals accepting government healthcare schemes, view location details prioritized from closest to farthest distance, and get immediate directions.
+    </p>
+  </div>
+</div>
+
+<!-- WORKFLOW STEPPER -->
+<div class="stepper-wrap" style="margin-bottom:24px;">
+  <div class="stepper-bar">
+    <div class="stepper-progress" style="width: 100%;"></div>
+  </div>
+  <div class="stepper-steps" style="grid-template-columns:repeat(5, 1fr);">
+    <a href="{{ url_for('profile_view') }}" class="step-item completed">
+      <span class="step-num">✓</span>
+      <span class="step-label">
+        <b>1. My Profile</b>
+        <small>Core details</small>
+      </span>
+    </a>
+    <a href="{{ url_for('schemes') }}" class="step-item completed">
+      <span class="step-num">✓</span>
+      <span class="step-label">
+        <b>2. Scheme Finder</b>
+        <small>Needs assessed</small>
+      </span>
+    </a>
+    <a href="{{ url_for('recommended_schemes') }}" class="step-item completed">
+      <span class="step-num">✓</span>
+      <span class="step-label">
+        <b>3. Recommendations</b>
+        <small>Scheme selected</small>
+      </span>
+    </a>
+    <a href="{{ url_for('documents', scheme_id=selected_scheme.id if selected_scheme else None) }}" class="step-item completed">
+      <span class="step-num">✓</span>
+      <span class="step-label">
+        <b>4. Documents</b>
+        <small>Verified ready</small>
+      </span>
+    </a>
+    <a href="{{ url_for('hospitals') }}" class="step-item active">
+      <span class="step-num">5</span>
+      <span class="step-label">
+        <b>5. Hospitals</b>
+        <small>Network & map finder</small>
+      </span>
+    </a>
+  </div>
+</div>
+
+<!-- SCHEME CONTEXT & SEARCH / FILTER BAR -->
+<div class="panel" style="margin-bottom:20px;padding:16px 20px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+    
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      {% if selected_scheme %}
+      <span style="font-size:12px;color:#475569;">Empanelled for:</span>
+      <span class="status-pill" style="background:#eff6ff;color:#1e40af;font-size:12px;font-weight:700;padding:5px 12px;">
+        ★ {{ selected_scheme.short_tag or selected_scheme.name }}
+      </span>
+      {% else %}
+      <span style="font-size:12px;font-weight:700;color:#1e3a8a;">
+        Showing all accredited welfare network hospitals
+      </span>
+      {% endif %}
+      <span style="font-size:11px;color:#64748b;margin-left:4px;">
+        (Sorted by <b>Shortest Distance (Min to Max)</b>)
+      </span>
+    </div>
+
+    <!-- Location & Search Filter -->
+    <form method="GET" action="{{ url_for('hospitals') }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      {% if selected_scheme %}
+      <input type="hidden" name="scheme_id" value="{{ selected_scheme.id }}">
+      {% endif %}
+      <input type="text" name="q" value="{{ query }}" placeholder="Search hospital name, city, district..." 
+             style="padding:7px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;min-width:240px;">
+      <button type="submit" class="btn btn-primary btn-sm" style="padding:7px 14px;">Filter</button>
+      {% if query %}
+      <a href="{{ url_for('hospitals', scheme_id=selected_scheme.id if selected_scheme else None) }}" class="btn btn-outline btn-sm">Clear</a>
+      {% endif %}
+    </form>
+
+  </div>
+</div>
+
+<!-- TWO COLUMN LAYOUT: HOSPITAL LIST (LEFT) & DETAIL SIDEBAR WITH MAP (RIGHT) -->
+<div class="hospital-layout" style="display:grid;grid-template-columns:minmax(0, 1.4fr) minmax(360px, 1fr);gap:20px;align-items:start;">
+
+  <!-- LEFT COLUMN: HOSPITALS LIST PRIORITIZED BY DISTANCE MIN TO MAX -->
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    
+    {% if hospitals %}
+      {% for h in hospitals %}
+      <div class="panel hospital-card {% if loop.first %}active-hospital-card{% endif %}" id="hosp-card-{{ h.id }}"
+           onclick="selectHospital({{ h.id }})"
+           style="padding:18px 20px;cursor:pointer;border:2px solid {% if loop.first %}#2563eb{% else %}#e2e8f0{% endif %};border-radius:12px;background:#ffffff;transition:all 0.2s ease;box-shadow:var(--shadow);">
+        
+        <!-- Header: Name, Distance Badge, Hospital Type -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+          <div>
+            <span style="font-size:10px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:0.5px;display:block;">
+              {{ h.hospital_type }}
+            </span>
+            <h3 style="font-size:16px;font-weight:800;color:#0f172a;margin:2px 0 0;font-family:'Manrope',sans-serif;">
+              {{ h.name }}
+            </h3>
+            <p style="font-size:11px;color:#64748b;margin:3px 0 0;">
+              📍 {{ h.address }}, {{ h.district }}, {{ h.state }} - {{ h.pincode }}
+            </p>
+          </div>
+
+          <!-- Distance Pill: Prioritized Min to Max -->
+          <div style="text-align:right;flex-shrink:0;">
+            <span class="status-pill" style="background:#f0fdf4;color:#15803d;font-weight:800;font-size:12px;padding:6px 10px;border:1px solid #bbf7d0;">
+              {% if loop.first %}★ Closest: {% endif %}{{ h.distance_km }} km
+            </span>
+          </div>
+        </div>
+
+        <!-- Key Specialties & Departments -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px;">
+          {% for sp in h.specialties[:4] %}
+          <span style="font-size:11px;background:#f1f5f9;color:#334155;padding:3px 8px;border-radius:6px;border:1px solid #e2e8f0;font-weight:600;">
+            🩺 {{ sp }}
+          </span>
+          {% endfor %}
+        </div>
+
+        <!-- Empanelled Schemes & Action Hint -->
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:10px;font-weight:700;color:#64748b;">Schemes:</span>
+            {% for s in h.schemes_empanelled %}
+            <span style="background:#eff6ff;color:#1e40af;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;border:1px solid #bfdbfe;">
+              {{ s }}
+            </span>
+            {% endfor %}
+          </div>
+          <span style="font-size:11px;font-weight:700;color:#2563eb;">
+            Click to view map & location ↗
+          </span>
+        </div>
+
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="panel" style="text-align:center;padding:40px 20px;">
+        <h3>No hospitals found matching your query</h3>
+        <p style="color:#64748b;font-size:12px;">Try clearing your search keyword.</p>
+        <a href="{{ url_for('hospitals') }}" class="btn btn-outline btn-sm">Reset Filter</a>
+      </div>
+    {% endif %}
+
+  </div>
+
+  <!-- RIGHT COLUMN: INTERACTIVE SIDEBAR WITH HOSPITAL DETAILS AND LEAFLET MAP -->
+  <aside class="panel" style="position:sticky;top:20px;padding:20px;border-radius:14px;box-shadow:var(--shadow);" id="hospital-sidebar">
+    
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid #edf2f7;padding-bottom:10px;">
+      <span style="font-size:11px;font-weight:700;color:#2563eb;letter-spacing:0.5px;text-transform:uppercase;">
+        SELECTED HOSPITAL & LOCATION
+      </span>
+      <span id="side-dist-badge" class="status-pill" style="background:#f0fdf4;color:#15803d;font-weight:700;font-size:11px;">
+        -- km away
+      </span>
+    </div>
+
+    <!-- Hospital Identity -->
+    <h2 id="side-hosp-name" style="font-size:17px;font-weight:800;color:#0f172a;margin:0 0 4px;font-family:'Manrope',sans-serif;">
+      Hospital Details
+    </h2>
+    <p id="side-hosp-type" style="font-size:11px;color:#2563eb;font-weight:600;margin:0 0 10px;">
+      Government / Empanelled
+    </p>
+
+    <!-- Address & Contact -->
+    <div style="background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:14px;font-size:12px;">
+      <div style="margin-bottom:6px;">
+        <span style="color:#64748b;">📍 Address:</span>
+        <div id="side-hosp-address" style="color:#1e293b;font-weight:600;margin-top:2px;">--</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;">
+        <div>
+          <span style="color:#64748b;font-size:10px;display:block;">Phone:</span>
+          <span id="side-hosp-phone" style="font-weight:700;color:#0f172a;">--</span>
+        </div>
+        <div>
+          <span style="color:#64748b;font-size:10px;display:block;">Emergency:</span>
+          <span id="side-hosp-helpline" style="font-weight:700;color:#dc2626;">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Specialties Widget -->
+    <div style="margin-bottom:16px;">
+      <strong style="font-size:12px;color:#0f172a;display:block;margin-bottom:8px;">Specialties & Clinical Services:</strong>
+      <div id="side-hosp-specialties" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+    </div>
+
+    <!-- INTERACTIVE MAP CONTAINER -->
+    <div style="margin-bottom:16px;">
+      <strong style="font-size:12px;color:#0f172a;display:block;margin-bottom:6px;">Hospital Map & Geolocation:</strong>
+      <div id="hospital-map" style="height:230px;width:100%;border-radius:10px;border:1px solid #cbd5e1;overflow:hidden;background:#e2e8f0;"></div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <a id="side-gmap-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="background:#2563eb;font-weight:700;width:100%;">
+        🗺️ Open Directions in Google Maps ↗
+      </a>
+      <a id="side-call-btn" href="#" class="btn btn-outline" style="width:100%;font-weight:600;">
+        📞 Call Aarogyamitra Helpdesk
+      </a>
+    </div>
+
+  </aside>
+
+</div>
+
+<!-- BOTTOM WORKFLOW ACTION BAR -->
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;background:#ffffff;border:1px solid #e2e8f0;padding:20px 24px;border-radius:12px;box-shadow:var(--shadow);margin-top:24px;margin-bottom:24px;">
+  <a href="{{ url_for('documents', scheme_id=selected_scheme.id if selected_scheme else None) }}" class="btn btn-outline">
+    ← 4. Back to Documents
+  </a>
+  <a href="{{ url_for('assistant') }}" class="btn btn-primary" style="background:#1e3a8a;font-size:13px;padding:12px 24px;">
+    Need Assistance? Ask SwasthyaSetu AI →
+  </a>
+</div>
+
+<!-- EMBEDDED HOSPITALS JSON DATA FOR DYNAMIC INTERACTIVE SIDEBAR & MAP -->
+<script>
+const HOSPITALS_DATA = {{ hospitals|tojson }};
+let mapInstance = null;
+let currentMarker = null;
+
+function initMap() {
+  if (HOSPITALS_DATA.length > 0) {
+    const first = HOSPITALS_DATA[0];
+    mapInstance = L.map('hospital-map').setView([first.latitude, first.longitude], 14);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(mapInstance);
+
+    selectHospital(first.id);
+  }
+}
+
+function selectHospital(id) {
+  const hosp = HOSPITALS_DATA.find(h => h.id === id);
+  if (!hosp) return;
+
+  // Highlight card
+  document.querySelectorAll('.hospital-card').forEach(c => {
+    c.style.borderColor = '#e2e8f0';
+    c.classList.remove('active-hospital-card');
+  });
+  const card = document.getElementById('hosp-card-' + id);
+  if (card) {
+    card.style.borderColor = '#2563eb';
+    card.classList.add('active-hospital-card');
+  }
+
+  // Update sidebar info
+  document.getElementById('side-dist-badge').textContent = hosp.distance_km + ' km away';
+  document.getElementById('side-hosp-name').textContent = hosp.name;
+  document.getElementById('side-hosp-type').textContent = hosp.hospital_type;
+  document.getElementById('side-hosp-address').textContent = hosp.address + ', ' + hosp.district + ', ' + hosp.state + ' - ' + hosp.pincode;
+  document.getElementById('side-hosp-phone').textContent = hosp.phone;
+  document.getElementById('side-hosp-helpline').textContent = hosp.emergency_helpline;
+
+  // Update specialties badges in sidebar
+  const specBox = document.getElementById('side-hosp-specialties');
+  if (specBox) {
+    specBox.innerHTML = '';
+    (hosp.specialties || []).forEach(sp => {
+      const badge = document.createElement('span');
+      badge.style = 'font-size:11px;background:#eff6ff;color:#1e40af;padding:3px 8px;border-radius:6px;border:1px solid #bfdbfe;font-weight:600;';
+      badge.textContent = '🩺 ' + sp;
+      specBox.appendChild(badge);
+    });
+  }
+
+  // Navigation Links
+  const gmapUrl = `https://www.google.com/maps/dir/?api=1&destination=${hosp.latitude},${hosp.longitude}`;
+  document.getElementById('side-gmap-btn').href = gmapUrl;
+  document.getElementById('side-call-btn').href = 'tel:' + hosp.phone.replace(/[^0-9+]/g, '');
+
+  // Update Map Marker & Center
+  if (mapInstance) {
+    mapInstance.setView([hosp.latitude, hosp.longitude], 15);
+    if (currentMarker) {
+      mapInstance.removeLayer(currentMarker);
+    }
+    currentMarker = L.marker([hosp.latitude, hosp.longitude]).addTo(mapInstance);
+    currentMarker.bindPopup(`<b>${hosp.name}</b><br>${hosp.distance_km} km away<br><small style="color:#2563eb;">${hosp.hospital_type}</small>`).openPopup();
+    
+    // Invalidate size to ensure clean tiles
+    setTimeout(() => { mapInstance.invalidateSize(); }, 200);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', initMap);
+</script>
+
+<style>
+.active-hospital-card {
+  border-color: #2563eb !important;
+  background: #fbfdff !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12) !important;
+}
+</style>
+
+{% endblock %}

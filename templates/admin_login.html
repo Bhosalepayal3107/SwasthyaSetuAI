@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Sign In — SwasthyaSetu AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#f8fafc;
+            --surface:#ffffff;
+            --primary:#2563eb;
+            --primary-hover:#1d4ed8;
+            --primary-light:#eff6ff;
+            --navy:#1e3a8a;
+            --navy-dark:#0f172a;
+            --border:#e2e8f0;
+            --text:#0f172a;
+            --text-secondary:#475569;
+            --text-muted:#64748b;
+            --shadow-lg:0 20px 35px -10px rgba(37,99,235,0.12),0 10px 10px -5px rgba(0,0,0,0.03);
+        }
+        body{
+            font-family:'Inter',system-ui,sans-serif;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:linear-gradient(135deg,#eff6ff 0%,#f8fafc 50%,#e0e7ff 100%);
+            color:var(--text);
+            padding:24px 16px;
+        }
+        .login-container{
+            width:100%;
+            max-width:440px;
+        }
+        .login-card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:20px;
+            padding:40px 34px;
+            box-shadow:var(--shadow-lg);
+        }
+        .login-logo{
+            text-align:center;
+            margin-bottom:12px;
+        }
+        .login-logo .icon{
+            width:56px;
+            height:56px;
+            background:var(--navy);
+            border-radius:16px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            font-size:26px;
+            color:#ffffff;
+            box-shadow:0 8px 20px rgba(30,58,138,0.25);
+        }
+        .login-card h1{
+            text-align:center;
+            font-size:1.55rem;
+            font-weight:800;
+            color:var(--navy-dark);
+            font-family:'Manrope',sans-serif;
+            margin:14px 0 4px;
+        }
+        .login-card .subtitle{
+            text-align:center;
+            font-size:.88rem;
+            color:var(--text-muted);
+            margin-bottom:26px;
+        }
+        .admin-badge{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            background:var(--primary-light);
+            border:1px solid #bfdbfe;
+            border-radius:10px;
+            padding:10px 16px;
+            margin-bottom:22px;
+            font-size:.82rem;
+            font-weight:600;
+            color:#1e40af;
+        }
+        .admin-badge .badge-icon{
+            font-size:16px;
+        }
+        .form-group{margin-bottom:18px;}
+        .form-group label{
+            display:block;
+            font-size:.8rem;
+            font-weight:700;
+            color:var(--text-secondary);
+            margin-bottom:6px;
+            text-transform:uppercase;
+            letter-spacing:.4px;
+        }
+        .form-group input{
+            width:100%;
+            padding:12px 16px;
+            background:#ffffff;
+            border:1px solid var(--border);
+            border-radius:10px;
+            color:var(--text);
+            font-size:.95rem;
+            font-family:inherit;
+            transition:border-color .2s,box-shadow .2s;
+        }
+        .form-group input:focus{
+            outline:none;
+            border-color:var(--primary);
+            box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+        }
+        .form-group input::placeholder{color:#94a3b8;}
+        .submit-btn{
+            width:100%;
+            padding:13px;
+            background:var(--primary);
+            color:#ffffff;
+            border:none;
+            border-radius:10px;
+            font-size:.95rem;
+            font-weight:700;
+            cursor:pointer;
+            font-family:inherit;
+            margin-top:8px;
+            transition:all .15s ease;
+            box-shadow:0 4px 14px rgba(37,99,235,0.3);
+        }
+        .submit-btn:hover{
+            background:var(--primary-hover);
+            transform:translateY(-1px);
+            box-shadow:0 6px 18px rgba(37,99,235,0.4);
+        }
+        .flash-msg{
+            padding:12px 16px;
+            border-radius:10px;
+            font-size:.86rem;
+            margin-bottom:18px;
+            font-weight:500;
+        }
+        .flash-msg.error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
+        .flash-msg.info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;}
+        .auth-footer{
+            margin-top:22px;
+            text-align:center;
+            font-size:.88rem;
+            color:var(--text-muted);
+        }
+        .auth-footer a{
+            color:var(--primary);
+            text-decoration:none;
+            font-weight:600;
+        }
+        .auth-footer a:hover{text-decoration:underline;}
+
+        /* Language Switcher */
+        .lang-picker-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ffffff;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 4px 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            transition: all 0.2s;
+        }
+        .lang-picker-box:hover {
+            border-color: var(--primary);
+        }
+        .lang-globe { font-size: 13px; line-height: 1; }
+        .portal-lang-select {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--navy);
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .portal-lang-select option {
+            font-weight: 600;
+            color: #0f172a;
+            background: #ffffff;
+        }
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-card">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+            <div class="lang-picker-box" title="Select Language / भाषा निवडा / भाषा चुनें">
+                <span class="lang-globe">🌐</span>
+                <select class="portal-lang-select" onchange="changePortalLanguage(this.value)" aria-label="Select Language">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="login-logo"><div class="icon">🛡️</div></div>
+        <h1>Administrator Sign In</h1>
+        <p class="subtitle">SwasthyaSetu AI — Scheme Management Portal</p>
+
+        <div class="admin-badge">
+            <span class="badge-icon">🔐</span>
+            <span>This login is for authorized government administrators only</span>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for cat, msg in messages %}
+        <div class="flash-msg {{ cat }}">{{ msg }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('admin_login') }}">
+            <div class="form-group">
+                <label>Admin Email / Identifier</label>
+                <input type="text" name="email" required placeholder="admin@123" autofocus>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="••••••••••••">
+            </div>
+            <button type="submit" class="submit-btn">Sign In to Admin Portal →</button>
+        </form>
+
+        <div class="auth-footer">
+            <a href="{{ url_for('login') }}">← Beneficiary Login</a>
+            <div style="margin-top:8px;">
+                <a href="/" style="font-size:0.82rem;color:var(--text-muted);">Back to Public Portal</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Language Switcher (Native, No Google Translate) -->
+<script src="{{ url_for('static', filename='language_switcher.js') }}"></script>
+</body>
+</html>

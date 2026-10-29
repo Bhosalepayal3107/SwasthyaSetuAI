@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>{{ page_title }} — SwasthyaSetu AI Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#f8fafc;
+            --surface:#ffffff;
+            --surface-subtle:#f1f5f9;
+            --primary:#2563eb;
+            --primary-hover:#1d4ed8;
+            --primary-light:#eff6ff;
+            --navy:#1e3a8a;
+            --navy-dark:#0f172a;
+            --border:#e2e8f0;
+            --border-focus:#bfdbfe;
+            --text:#0f172a;
+            --text-secondary:#475569;
+            --text-muted:#64748b;
+            --success:#16a34a;
+            --danger:#dc2626;
+            --shadow:0 4px 16px rgba(37,99,235,0.06);
+            --shadow-md:0 10px 25px -5px rgba(37,99,235,0.08),0 8px 10px -6px rgba(0,0,0,0.04);
+        }
+        body{
+            font-family:'Inter',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            min-height:100vh;
+        }
+
+        /* TOP BAR */
+        .admin-topbar{
+            background:var(--navy);
+            border-bottom:1px solid rgba(255,255,255,0.1);
+            padding:14px 32px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            position:sticky;
+            top:0;
+            z-index:100;
+            box-shadow:0 2px 10px rgba(15,23,42,0.15);
+        }
+        .admin-topbar .brand{display:flex;align-items:center;gap:12px;}
+        .admin-topbar .brand-icon{
+            width:36px;height:36px;border-radius:10px;
+            background:#ffffff;
+            display:flex;align-items:center;justify-content:center;
+            font-size:20px;color:var(--primary);
+            font-weight:bold;box-shadow:0 2px 6px rgba(0,0,0,0.15);
+        }
+        .admin-topbar .brand h1{font-size:1.15rem;font-weight:700;color:#ffffff;font-family:'Manrope',sans-serif;}
+        .admin-topbar .brand h1 span{color:#93c5fd;font-weight:400;font-size:.85rem;margin-left:6px;}
+        .admin-topbar .nav-links{display:flex;gap:12px;align-items:center;}
+        .admin-topbar .nav-links a{
+            color:#e2e8f0;text-decoration:none;font-size:.85rem;
+            padding:7px 14px;border-radius:8px;transition:all .18s;
+            font-weight:500;
+        }
+        .admin-topbar .nav-links a:hover{background:rgba(255,255,255,0.15);color:#ffffff;}
+        .admin-topbar .nav-links a.active{background:rgba(255,255,255,0.22);color:#ffffff;}
+
+        /* Language Switcher */
+        .admin-topbar .lang-picker-box{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            background:rgba(255,255,255,0.14);
+            border:1px solid rgba(255,255,255,0.3);
+            border-radius:20px;
+            padding:5px 12px;
+            transition:all .18s;
+        }
+        .admin-topbar .lang-picker-box:hover{
+            background:rgba(255,255,255,0.22);
+            border-color:rgba(255,255,255,0.5);
+        }
+        .admin-topbar .lang-globe{
+            font-size:14px;
+            line-height:1;
+            user-select:none;
+        }
+        .admin-topbar .portal-lang-select{
+            border:none;
+            outline:none;
+            background:transparent;
+            font-size:.85rem;
+            font-weight:600;
+            color:#ffffff;
+            cursor:pointer;
+            font-family:inherit;
+            padding:2px 4px 2px 0;
+        }
+        .admin-topbar .portal-lang-select option{
+            font-weight:600;
+            color:#0f172a;
+            background:#ffffff;
+        }
+
+        /* MAIN CONTAINER */
+        .form-container{max-width:880px;margin:0 auto;padding:32px 24px 70px;}
+        .page-header-box{margin-bottom:24px;}
+        .page-header-box h2{
+            font-size:1.6rem;font-weight:800;color:var(--navy-dark);
+            font-family:'Manrope',sans-serif;margin-bottom:6px;
+        }
+        .page-header-box p{color:var(--text-muted);font-size:.9rem;}
+
+        /* FLASH */
+        .flash-msg{
+            padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:16px;
+            font-weight:500;
+        }
+        .flash-msg.info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;}
+        .flash-msg.error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
+
+        /* FORM CARD */
+        .form-card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:28px 28px;
+            margin-bottom:24px;
+            box-shadow:var(--shadow);
+        }
+        .form-card .section-title{
+            font-size:.92rem;font-weight:700;color:var(--navy);
+            text-transform:uppercase;letter-spacing:.6px;margin-bottom:20px;
+            padding-bottom:10px;border-bottom:2px solid var(--primary-light);
+            display:flex;align-items:center;gap:8px;
+        }
+        .form-card .section-title .section-icon{
+            width:26px;height:26px;border-radius:6px;background:var(--primary-light);
+            color:var(--primary);display:flex;align-items:center;justify-content:center;
+            font-size:14px;font-weight:bold;
+        }
+
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+        .form-row.full{grid-template-columns:1fr;}
+        .form-row.triple{grid-template-columns:1fr 1fr 1fr;}
+
+        .form-group{margin-bottom:0;}
+        .form-group label{
+            display:block;font-size:.8rem;font-weight:700;
+            color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;
+        }
+        .form-group label .required{color:var(--danger);margin-left:2px;}
+        .form-group input,.form-group select,.form-group textarea{
+            width:100%;padding:10px 14px;
+            background:#ffffff;border:1px solid var(--border);
+            border-radius:8px;color:var(--text);font-size:.92rem;font-family:inherit;
+            transition:border-color .15s,box-shadow .15s;
+        }
+        .form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+            outline:none;border-color:var(--primary);
+            box-shadow:0 0 0 3px rgba(37,99,235,0.12);
+        }
+        .form-group textarea{min-height:90px;resize:vertical;line-height:1.5;}
+        .form-group .help-text{font-size:.76rem;color:var(--text-muted);margin-top:5px;line-height:1.4;}
+        .form-group input::placeholder,.form-group textarea::placeholder{color:#94a3b8;}
+
+        /* DOCUMENT CHECKLIST GRID */
+        .doc-checklist-grid{
+            display:grid;grid-template-columns:repeat(2, 1fr);gap:10px;
+            margin-top:10px;margin-bottom:16px;
+        }
+        .doc-check-item{
+            display:flex;align-items:center;gap:10px;
+            padding:10px 14px;background:#f8fafc;
+            border:1px solid #e2e8f0;border-radius:8px;
+            transition:all .15s ease;cursor:pointer;
+        }
+        .doc-check-item:hover{
+            background:#eff6ff;border-color:#bfdbfe;
+        }
+        .doc-check-item input[type="checkbox"]{
+            width:18px;height:18px;accent-color:var(--primary);
+            cursor:pointer;flex-shrink:0;
+        }
+        .doc-check-item label{
+            font-size:.86rem;color:var(--text);cursor:pointer;
+            margin:0;text-transform:none;letter-spacing:0;font-weight:500;
+            user-select:none;line-height:1.3;
+        }
+
+        /* STATUS CHECKBOX */
+        .checkbox-row{
+            display:flex;align-items:center;gap:12px;
+            padding:14px 18px;background:var(--primary-light);
+            border-radius:10px;border:1px solid #bfdbfe;
+        }
+        .checkbox-row input[type="checkbox"]{
+            width:20px;height:20px;accent-color:var(--primary);cursor:pointer;
+        }
+        .checkbox-row label{
+            font-size:.9rem;cursor:pointer;margin:0;color:var(--navy);
+            text-transform:none;letter-spacing:0;font-weight:600;
+        }
+
+        /* BUTTONS */
+        .form-actions{display:flex;gap:14px;margin-top:28px;}
+        .btn-submit{
+            padding:12px 32px;border-radius:8px;border:none;
+            background:var(--primary);color:#ffffff;font-size:.95rem;font-weight:700;
+            cursor:pointer;font-family:inherit;transition:all .15s ease;
+            box-shadow:0 4px 12px rgba(37,99,235,0.25);
+        }
+        .btn-submit:hover{
+            background:var(--primary-hover);transform:translateY(-1px);
+            box-shadow:0 6px 16px rgba(37,99,235,0.35);
+        }
+        .btn-cancel{
+            padding:12px 28px;border-radius:8px;
+            border:1px solid var(--border);background:#ffffff;
+            color:var(--text-secondary);font-size:.92rem;font-weight:600;cursor:pointer;
+            font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;
+            transition:all .15s;
+        }
+        .btn-cancel:hover{background:var(--surface-subtle);color:var(--text);}
+
+        @media(max-width:768px){
+            .form-row,.form-row.triple,.doc-checklist-grid{grid-template-columns:1fr;}
+            .form-container{padding:20px 14px 40px;}
+            .form-card{padding:20px 16px;}
+            .admin-topbar{padding:12px 16px;}
+        }
+    </style>
+</head>
+<body>
+
+<header class="admin-topbar">
+    <div class="brand">
+        <div class="brand-icon">✚</div>
+        <h1>SwasthyaSetu AI <span>Administrator Portal</span></h1>
+    </div>
+    <div class="nav-links">
+        <!-- Language Switcher: English, Hindi, Marathi -->
+        <div class="lang-picker-box" title="Select Language / भाषा निवडा / भाषा चुनें">
+            <span class="lang-globe">🌐</span>
+            <select class="portal-lang-select" onchange="changePortalLanguage(this.value)" aria-label="Select Language">
+                <option value="en">English</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="mr">मराठी (Marathi)</option>
+            </select>
+        </div>
+        <a href="{{ url_for('admin_dashboard') }}" class="active">Scheme Management</a>
+        <a href="/">Public Portal</a>
+        <a href="{{ url_for('admin_logout') }}" style="color:#fca5a5;">Logout</a>
+    </div>
+</header>
+
+<main class="form-container">
+    <div class="page-header-box">
+        <h2>{% if mode == 'edit' %}Edit Scheme: {{ scheme.name }}{% else %}Add New Government Scheme{% endif %}</h2>
+        <p>Define scheme details, target beneficiaries, eligibility rules, and required documents. Changes reflect immediately in citizen recommendations.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash-msg {{ cat }}">{{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{% if mode == 'edit' %}{{ url_for('admin_scheme_edit', scheme_id=scheme.id) }}{% else %}{{ url_for('admin_scheme_new') }}{% endif %}">
+
+        <!-- 1. BASIC INFORMATION -->
+        <div class="form-card">
+            <div class="section-title">
+                <span class="section-icon">1</span>
+                Basic Scheme Information
+            </div>
+            <div class="form-row full">
+                <div class="form-group">
+                    <label>Scheme Full Name <span class="required">*</span></label>
+                    <input type="text" name="name" required placeholder="e.g. Pradhan Mantri Jan Arogya Yojana (AB-PMJAY)"
+                           value="{{ scheme.name if scheme else '' }}">
+                </div>
+            </div>
+            <div class="form-row triple">
+                <div class="form-group">
+                    <label>Short Tag / Acronym</label>
+                    <input type="text" name="short_tag" placeholder="e.g. PM-JAY"
+                           value="{{ scheme.short_tag if scheme else '' }}">
+                </div>
+                <div class="form-group">
+                    <label>Category <span class="required">*</span></label>
+                    <select name="category">
+                        {% set cats = ["Health Assurance","Employee Healthcare","Direct Financial Grant","Disease-Specific","Maternal Health","Maternal & Child Health","Child Health","Mental Health","Medicines","Diagnostics","Primary Care","Disability Healthcare","Disability Support","Eye Care","Emergency Care","Senior Citizen Healthcare","Accident Insurance","Social Security","Occupational Welfare","Preventive Health","Tertiary Healthcare","General"] %}
+                        {% for c in cats %}
+                        <option value="{{ c }}" {% if scheme and scheme.category == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Government Jurisdiction</label>
+                    <select name="govt_level">
+                        {% set levels = ["Central Government","Central Government (NHM)","Central Government (National Trust)","State Government","Joint Central-State Scheme"] %}
+                        {% for l in levels %}
+                        <option value="{{ l }}" {% if scheme and scheme.govt_level == l %}selected{% endif %}>{{ l }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row full">
+                <div class="form-group">
+                    <label>Detailed Description <span class="required">*</span></label>
+                    <textarea name="description" rows="3" placeholder="Provide a comprehensive summary of what the scheme provides, coverage ceilings, and scope..." required>{{ scheme.description if scheme else '' }}</textarea>
+                </div>
+            </div>
+            <div class="form-row full">
+                <div class="form-group">
+                    <label>Who is Eligible / Target Beneficiaries</label>
+                    <textarea name="who_benefits" rows="2" placeholder="e.g. Low-income families, BPL card holders, pregnant mothers, dialysis patients...">{{ scheme.who_benefits if scheme else '' }}</textarea>
+                    <div class="help-text">Clearly describe the intended demographic and group criteria.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. JURISDICTION & ELIGIBILITY RULES -->
+        <div class="form-card">
+            <div class="section-title">
+                <span class="section-icon">2</span>
+                Jurisdiction & Eligibility Criteria
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>State / Region Applicable <span class="required">*</span></label>
+                    <select name="states_applicable">
+                        {% set all_states = [
+                            "All India (Universal)",
+                            "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+                            "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+                            "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+                            "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+                            "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+                            "Uttar Pradesh", "Uttarakhand", "West Bengal",
+                            "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
+                            "Delhi (NCT)", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+                        ] %}
+                        {% for st in all_states %}
+                        <option value="{{ st }}" {% if scheme and (scheme.states_applicable == st or (st == 'All India (Universal)' and scheme.states_applicable in ['All', 'All India'])) %}selected{% endif %}>
+                            {{ st }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="help-text">Select "All India (Universal)" for central schemes or choose a specific state.</div>
+                </div>
+                <div class="form-group">
+                    <label>Income Limit / Financial Ceiling</label>
+                    <input type="text" name="income_limit" placeholder="e.g. Below ₹1 lakh, BPL only, No income limit"
+                           value="{{ scheme.income_limit if scheme else 'No income limit' }}">
+                    <div class="help-text">Specify income threshold or type 'No income limit'.</div>
+                </div>
+            </div>
+
+            <div class="form-row full">
+                <div class="form-group">
+                    <label>Statutory Eligibility Rules (one condition per line)</label>
+                    <textarea name="eligibility_rules" rows="4" placeholder="Rule 1: Must hold valid Ration Card&#10;Rule 2: Treatment must be at empanelled hospital&#10;Rule 3: Aadhaar biometric verification required">{{ scheme.eligibility_rules_text if scheme else '' }}</textarea>
+                    <div class="help-text">Enter each verifiable condition on a separate line. Displayed transparently to citizens on scheme cards.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. REQUIRED DOCUMENTS CHECKLIST -->
+        <div class="form-card">
+            <div class="section-title">
+                <span class="section-icon">3</span>
+                Required Documents Checklist
+            </div>
+            <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:12px;">
+                Select all applicable documents required for this scheme. The recommendation engine automatically checks citizen readiness based on these selections.
+            </p>
+
+            {% set standard_docs = [
+                ("Aadhaar Card (Applicant / Patient)", "doc_aadhaar"),
+                ("Ration Card (Yellow / Orange / White / Antyodaya AAY)", "doc_ration"),
+                ("Income Certificate (issued by Tahsildar / SDM)", "doc_income"),
+                ("Residence Proof / Domicile Certificate", "doc_residence"),
+                ("Doctor's Prescription & Medical Recommendation", "doc_prescription"),
+                ("Diagnostic Reports (Blood, X-Ray, CT, MRI, Biopsy)", "doc_reports"),
+                ("Hospital Treatment Estimate / Admission Cost Memo", "doc_estimate"),
+                ("Disability Certificate (UDID / Civil Surgeon)", "doc_disability"),
+                ("Government Health Card (Ayushman Card / State Card)", "doc_health_card"),
+                ("Caste / Category Certificate (SC / ST / OBC)", "doc_caste"),
+                ("BPL Certificate / Annapurna / SECC Letter", "doc_bpl"),
+                ("Birth Certificate / Age Proof", "doc_birth"),
+                ("Bank Account Passbook / Cancelled Cheque (DBT)", "doc_bank"),
+                ("Construction Worker (BOCW) ID Card", "doc_bocw"),
+                ("Senior Citizen Card / Age Proof", "doc_senior"),
+                ("Mother & Child Protection (MCP) Card / RCH ID", "doc_mcp"),
+                ("Government Employee ID / Pension Payment Order (PPO)", "doc_govt_emp"),
+                ("ESIC Pehchan Card / Insurance Card", "doc_esic")
+            ] %}
+
+            <div class="doc-checklist-grid">
+                {% for doc_title, doc_id in standard_docs %}
+                {% set is_checked = false %}
+                {% if scheme and scheme.required_documents_list %}
+                    {% for existing_doc in scheme.required_documents_list %}
+                        {% if doc_title.lower() in existing_doc.lower() or existing_doc.lower() in doc_title.lower() %}
+                            {% set is_checked = true %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <div class="doc-check-item">
+                    <input type="checkbox" name="required_documents" value="{{ doc_title }}" id="{{ doc_id }}"
+                           {% if is_checked %}checked{% endif %}>
+                    <label for="{{ doc_id }}">{{ doc_title }}</label>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-row full" style="margin-top:10px;">
+                <div class="form-group">
+                    <label>Other Additional Documents (one per line, if not listed above)</label>
+                    <textarea name="other_required_docs" rows="2" placeholder="e.g. MLC Report&#10;Affidavit on stamp paper"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. OFFICIAL APPLICATION & LINKS -->
+        <div class="form-card">
+            <div class="section-title">
+                <span class="section-icon">4</span>
+                Official Application Process & Portal Link
+            </div>
+            <div class="form-row full">
+                <div class="form-group">
+                    <label>Official Government Portal URL</label>
+                    <input type="url" name="official_website" placeholder="https://..."
+                           value="{{ scheme.official_website if scheme else 'https://mohfw.gov.in/' }}">
+                </div>
+            </div>
+            <div class="form-row full">
+                <div class="form-group">
+                    <label>How / Where to Apply</label>
+                    <textarea name="application_process" rows="2" placeholder="e.g. Visit the nearest Ayushman Helpdesk at empanelled hospital with Aadhaar and Ration Card...">{{ scheme.application_process if scheme else '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. SCHEME STATUS -->
+        <div class="form-card">
+            <div class="section-title">
+                <span class="section-icon">5</span>
+                Scheme Status
+            </div>
+            <div class="checkbox-row">
+                <input type="checkbox" name="is_active" id="is_active" value="1"
+                       {% if (scheme and scheme.is_active) or not scheme %}checked{% endif %}>
+                <label for="is_active">Active — Make scheme immediately available in the Citizen Recommendation Engine</label>
+            </div>
+        </div>
+
+        <!-- SUBMIT / CANCEL -->
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                {% if mode == 'edit' %}Save Scheme Changes{% else %}Create and Publish Scheme{% endif %}
+            </button>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn-cancel">Cancel</a>
+        </div>
+
+    </form>
+</main>
+
+<!-- Language Switcher (Native, No Google Translate) -->
+<script src="{{ url_for('static', filename='language_switcher.js') }}"></script>
+</body>
+</html>

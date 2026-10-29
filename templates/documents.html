@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- PAGE HEADING -->
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">DOCUMENT CENTRE · STEP 4 OF BENEFICIARY WORKFLOW</p>
+    <h1>Document Checklist & Verification</h1>
+    <p class="subheading">
+      Verify the required paperwork for your selected scheme and upload digital copies for readiness check before visiting an empanelled hospital.
+    </p>
+  </div>
+</div>
+
+<!-- WORKFLOW STEPPER -->
+<div class="stepper-wrap" style="margin-bottom:24px;">
+  <div class="stepper-bar">
+    <div class="stepper-progress" style="width: 80%;"></div>
+  </div>
+  <div class="stepper-steps" style="grid-template-columns:repeat(5, 1fr);">
+    <a href="{{ url_for('profile_view') }}" class="step-item completed">
+      <span class="step-num">✓</span>
+      <span class="step-label">
+        <b>1. My Profile</b>
+        <small>Core details</small>
+      </span>
+    </a>
+    <a href="{{ url_for('schemes') }}" class="step-item completed">
+      <span class="step-num">✓</span>
+      <span class="step-label">
+        <b>2. Scheme Finder</b>
+        <small>Needs assessed</small>
+      </span>
+    </a>
+    <a href="{{ url_for('recommended_schemes') }}" class="step-item completed">
+      <span class="step-num">✓</span>
+      <span class="step-label">
+        <b>3. Recommendations</b>
+        <small>Scheme selected</small>
+      </span>
+    </a>
+    <a href="{{ url_for('documents') }}" class="step-item active">
+      <span class="step-num">4</span>
+      <span class="step-label">
+        <b>4. Documents</b>
+        <small>Checklist & upload</small>
+      </span>
+    </a>
+    {% if selected_scheme %}
+    <a href="{{ url_for('hospitals', scheme_id=selected_scheme.id) }}" class="step-item">
+    {% else %}
+    <a href="{{ url_for('hospitals') }}" class="step-item">
+    {% endif %}
+      <span class="step-num">5</span>
+      <span class="step-label">
+        <b>5. Hospitals</b>
+        <small>Empanelled network & map</small>
+      </span>
+    </a>
+  </div>
+</div>
+
+<!-- SELECTED SCHEME BANNER -->
+<div class="panel" style="margin-bottom:24px;border-left:4px solid #2563eb;padding:18px 24px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+    <div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+        <span class="tag" style="background:#eff6ff;color:#1e40af;font-size:11px;font-weight:700;">
+          {{ selected_scheme.short_tag if selected_scheme else 'Flagship Scheme' }}
+        </span>
+        <span class="tag" style="background:#f1f5f9;color:#475569;font-size:11px;">
+          {{ selected_scheme.govt_level if selected_scheme else 'Central / State' }}
+        </span>
+      </div>
+      <h2 style="font-size:18px;font-weight:800;color:#0f172a;margin:0 0 4px;font-family:'Manrope',sans-serif;">
+        {{ selected_scheme.name if selected_scheme else 'Selected Scheme Documentation' }}
+      </h2>
+      <p style="font-size:12px;color:#64748b;margin:0;">
+        {{ selected_scheme.description if selected_scheme else 'Review required identification, ration card, and medical documents.' }}
+      </p>
+    </div>
+
+    <!-- Scheme Switcher -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <form method="GET" action="{{ url_for('documents') }}" style="display:flex;gap:8px;align-items:center;">
+        <label for="scheme_id_select" style="font-size:11px;font-weight:600;color:#475569;">Switch Scheme:</label>
+        <select name="scheme_id" id="scheme_id_select" onchange="this.form.submit()" style="padding:6px 12px;border-radius:6px;border:1px solid #cbd5e1;font-size:12px;">
+          {% for s in all_schemes %}
+          <option value="{{ s.id }}" {% if selected_scheme and selected_scheme.id == s.id %}selected{% endif %}>
+            {{ s.short_tag or s.name[:25] }} - {{ s.name[:40] }}
+          </option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- TWO COLUMN WORKFLOW: CHECKLIST & UPLOAD -->
+<div class="two-col" style="margin-bottom:24px;">
+
+  <!-- LEFT COLUMN: SCHEME-SPECIFIC CHECKLIST -->
+  <section class="panel">
+    <div class="panel-heading">
+      <span class="step-badge">01</span>
+      <div>
+        <h2>Required Documents Checklist</h2>
+        <p>Specific paperwork required for official enrollment and hospital admission.</p>
+      </div>
+    </div>
+
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:#1e3a8a;margin-bottom:6px;">
+        <span>Readiness Progress:</span>
+        <span id="ready-counter">0 of {{ checklist|length }} Ready</span>
+      </div>
+      <div style="height:6px;background:#e2e8f0;border-radius:6px;overflow:hidden;">
+        <div id="ready-progress-bar" style="height:100%;width:0%;background:#2563eb;transition:width 0.25s;"></div>
+      </div>
+    </div>
+
+    <div class="document-list">
+      {% for item in checklist %}
+      <label class="document-row" style="padding:12px 6px;cursor:pointer;">
+        <input type="checkbox" class="doc-chk" onchange="updateReadinessProgress()">
+        <span class="fake-check"></span>
+        <div style="flex:1;">
+          <b style="font-size:13px;color:#1e293b;display:block;">{{ item }}</b>
+          <small style="font-size:11px;color:#64748b;">Original + 2 self-attested photocopies recommended</small>
+        </div>
+        <span class="status-pill" style="background:#f1f5f9;color:#64748b;font-size:10px;padding:3px 8px;">Checklist</span>
+      </label>
+      {% endfor %}
+    </div>
+
+    <div class="notice compact" style="margin-top:16px;">
+      <span>💡</span>
+      <div>
+        <b>Tip for Faster Hospital Admission</b>
+        <p>
+          Always carry your original Aadhaar Card and Ration Card to the Aarogyamitra helpdesk located near the hospital admission counter.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT COLUMN: DOCUMENT UPLOAD & VERIFICATION -->
+  <section class="panel">
+    <div class="panel-heading">
+      <span class="step-badge">02</span>
+      <div>
+        <h2>Upload Documents for Verification</h2>
+        <p>Upload digital copies (PDF, JPG, PNG) to verify format compliance and legibility.</p>
+      </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('documents_upload') }}" id="document-form">
+      {% if selected_scheme %}
+      <input type="hidden" name="scheme_id" value="{{ selected_scheme.id }}">
+      {% endif %}
+
+      <label class="upload-zone" for="documents_input" style="padding:24px 16px;background:#f8fbff;border:2px dashed #93c5fd;border-radius:12px;display:flex;flex-direction:column;align-items:center;cursor:pointer;">
+        <span class="upload-icon" style="font-size:32px;color:#2563eb;margin-bottom:8px;">📁</span>
+        <b style="font-size:13px;color:#0f172a;">Click to select files or drag & drop</b>
+        <small style="color:#64748b;font-size:11px;">PDF, JPG, JPEG, PNG (Max 5 files, up to 10MB each)</small>
+        <input id="documents_input" type="file" name="documents" multiple accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="handleFileSelect(this)">
+      </label>
+
+      <div id="selected-files-list" style="margin:14px 0;font-size:12px;color:#475569;">
+        <!-- Dynamic list of newly selected files -->
+      </div>
+
+      <button type="submit" class="btn btn-primary full-btn" style="background:#2563eb;font-weight:700;">
+        📤 Upload & Verify Files
+      </button>
+    </form>
+
+    <!-- UPLOADED & VERIFIED DOCUMENTS LIST -->
+    {% if uploaded_files %}
+    <div style="margin-top:20px;border-top:1px solid #e2e8f0;padding-top:16px;">
+      <h3 style="font-size:13px;font-weight:700;color:#0f172a;margin:0 0 10px;">
+        Verified Uploaded Files ({{ uploaded_files|length }}):
+      </h3>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        {% for f in uploaded_files %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;">✓</span>
+            <div>
+              <b style="font-size:12px;color:#166534;display:block;">{{ f.filename }}</b>
+              <small style="font-size:10px;color:#4ade80;">Format Verified & Readability Confirmed · {{ f.size_kb }} KB</small>
+            </div>
+          </div>
+          <span style="background:#dcfce7;color:#15803d;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:700;">
+            Ready
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </section>
+
+</div>
+
+<!-- BOTTOM WORKFLOW NAVIGATION BAR -->
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;background:#ffffff;border:1px solid #e2e8f0;padding:20px 24px;border-radius:12px;box-shadow:var(--shadow);">
+  <a href="{{ url_for('recommended_schemes') }}" class="btn btn-outline">
+    ← 3. Back to Recommendations
+  </a>
+  {% if selected_scheme %}
+  <a href="{{ url_for('hospitals', scheme_id=selected_scheme.id) }}" class="btn btn-primary" style="background:#1e3a8a;font-size:13px;padding:12px 24px;">
+    Documents Ready — Proceed to 5. Empanelled Hospitals →
+  </a>
+  {% else %}
+  <a href="{{ url_for('hospitals') }}" class="btn btn-primary" style="background:#1e3a8a;font-size:13px;padding:12px 24px;">
+    Proceed to 5. Empanelled Hospitals →
+  </a>
+  {% endif %}
+</div>
+
+<script>
+function handleFileSelect(input) {
+  const list = document.getElementById('selected-files-list');
+  list.innerHTML = '';
+  if (input.files.length > 0) {
+    let html = '<div style="background:#eff6ff;padding:8px 12px;border-radius:6px;border:1px solid #bfdbfe;">';
+    html += '<b style="color:#1e40af;">' + input.files.length + ' file(s) selected:</b><ul style="margin:4px 0 0;padding-left:18px;">';
+    for (let i = 0; i < input.files.length; i++) {
+      html += '<li>' + input.files[i].name + ' (' + Math.round(input.files[i].size / 1024) + ' KB)</li>';
+    }
+    html += '</ul></div>';
+    list.innerHTML = html;
+  }
+}
+
+function updateReadinessProgress() {
+  const checkboxes = document.querySelectorAll('.doc-chk');
+  const checked = document.querySelectorAll('.doc-chk:checked').length;
+  const total = checkboxes.length;
+  document.getElementById('ready-counter').textContent = checked + ' of ' + total + ' Ready';
+  const pct = total > 0 ? (checked / total) * 100 : 0;
+  document.getElementById('ready-progress-bar').style.width = pct + '%';
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>{{ page_title }} — SwasthyaSetu AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#f8fafc;
+            --surface:#ffffff;
+            --surface-subtle:#f1f5f9;
+            --primary:#2563eb;
+            --primary-hover:#1d4ed8;
+            --primary-light:#eff6ff;
+            --navy:#1e3a8a;
+            --navy-dark:#0f172a;
+            --border:#e2e8f0;
+            --border-focus:#bfdbfe;
+            --text:#0f172a;
+            --text-secondary:#475569;
+            --text-muted:#64748b;
+            --success:#16a34a;
+            --success-light:#dcfce7;
+            --danger:#dc2626;
+            --danger-light:#fee2e2;
+            --warning:#d97706;
+            --warning-light:#fef3c7;
+            --shadow:0 4px 16px rgba(37,99,235,0.06);
+            --shadow-md:0 10px 25px -5px rgba(37,99,235,0.08),0 8px 10px -6px rgba(0,0,0,0.04);
+        }
+        body{
+            font-family:'Inter',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            min-height:100vh;
+        }
+
+        /* TOP BAR */
+        .admin-topbar{
+            background:var(--navy);
+            border-bottom:1px solid rgba(255,255,255,0.1);
+            padding:14px 32px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            position:sticky;
+            top:0;
+            z-index:100;
+            box-shadow:0 2px 10px rgba(15,23,42,0.15);
+        }
+        .admin-topbar .brand{display:flex;align-items:center;gap:12px;}
+        .admin-topbar .brand-icon{
+            width:36px;height:36px;border-radius:10px;
+            background:#ffffff;
+            display:flex;align-items:center;justify-content:center;
+            font-size:20px;color:var(--primary);
+            font-weight:bold;box-shadow:0 2px 6px rgba(0,0,0,0.15);
+        }
+        .admin-topbar .brand h1{font-size:1.15rem;font-weight:700;color:#ffffff;font-family:'Manrope',sans-serif;}
+        .admin-topbar .brand h1 span{color:#93c5fd;font-weight:400;font-size:.85rem;margin-left:6px;}
+        .admin-topbar .user-actions{display:flex;align-items:center;gap:14px;}
+        .admin-topbar .user-actions a{
+            color:#e2e8f0;text-decoration:none;font-size:.85rem;
+            padding:7px 14px;border-radius:8px;transition:all .18s;
+            font-weight:500;
+        }
+        .admin-topbar .user-actions a:hover{background:rgba(255,255,255,0.15);color:#ffffff;}
+        .admin-topbar .user-actions .btn-add-top{
+            background:#ffffff;color:var(--primary);font-weight:600;
+        }
+        .admin-topbar .user-actions .btn-add-top:hover{background:#eff6ff;color:var(--primary-hover);}
+        .admin-topbar .user-actions .btn-logout{
+            background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);
+        }
+        .admin-topbar .user-actions .btn-logout:hover{background:rgba(239,68,68,0.35);color:#ffffff;}
+
+        /* Language Switcher */
+        .admin-topbar .lang-picker-box{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            background:rgba(255,255,255,0.14);
+            border:1px solid rgba(255,255,255,0.3);
+            border-radius:20px;
+            padding:5px 12px;
+            transition:all .18s;
+        }
+        .admin-topbar .lang-picker-box:hover{
+            background:rgba(255,255,255,0.22);
+            border-color:rgba(255,255,255,0.5);
+        }
+        .admin-topbar .lang-globe{
+            font-size:14px;
+            line-height:1;
+            user-select:none;
+        }
+        .admin-topbar .portal-lang-select{
+            border:none;
+            outline:none;
+            background:transparent;
+            font-size:.85rem;
+            font-weight:600;
+            color:#ffffff;
+            cursor:pointer;
+            font-family:inherit;
+            padding:2px 4px 2px 0;
+        }
+        .admin-topbar .portal-lang-select option{
+            font-weight:600;
+            color:#0f172a;
+            background:#ffffff;
+        }
+
+        /* MAIN LAYOUT */
+        .admin-main{max-width:1340px;margin:0 auto;padding:32px 28px 70px;}
+
+        /* FLASH */
+        .flash-bar{margin-bottom:20px;}
+        .flash-msg{
+            padding:12px 18px;border-radius:10px;font-size:.88rem;margin-bottom:8px;
+            display:flex;align-items:center;gap:8px;font-weight:500;
+        }
+        .flash-msg.info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;}
+        .flash-msg.error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
+
+        /* STATS ROW */
+        .stats-row{
+            display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:18px;margin-bottom:28px;
+        }
+        .stat-card{
+            background:var(--surface);
+            border:1px solid var(--border);border-radius:14px;
+            padding:22px 24px;
+            box-shadow:var(--shadow);
+            position:relative;
+            overflow:hidden;
+        }
+        .stat-card::before{
+            content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+            background:var(--primary);border-radius:4px 0 0 4px;
+        }
+        .stat-card.green::before{background:var(--success);}
+        .stat-card.amber::before{background:var(--warning);}
+        .stat-card .label{
+            font-size:.8rem;color:var(--text-muted);text-transform:uppercase;
+            letter-spacing:.6px;font-weight:700;
+        }
+        .stat-card .value{
+            font-size:2.2rem;font-weight:800;margin-top:6px;
+            color:var(--navy-dark);font-family:'Manrope',sans-serif;
+        }
+        .stat-card.green .value{color:var(--success);}
+        .stat-card.amber .value{color:var(--warning);}
+
+        /* ACTION BAR */
+        .action-bar{
+            display:flex;align-items:center;justify-content:space-between;
+            flex-wrap:wrap;gap:12px;margin-bottom:18px;
+        }
+        .action-bar h2{font-size:1.35rem;font-weight:800;color:var(--navy-dark);font-family:'Manrope',sans-serif;}
+        .btn-add{
+            padding:11px 24px;border-radius:8px;border:none;
+            background:var(--primary);color:#ffffff;font-size:.9rem;font-weight:700;
+            cursor:pointer;font-family:inherit;text-decoration:none;
+            display:inline-flex;align-items:center;gap:8px;
+            transition:all .18s ease;box-shadow:0 4px 12px rgba(37,99,235,0.25);
+        }
+        .btn-add:hover{
+            background:var(--primary-hover);transform:translateY(-1px);
+            box-shadow:0 6px 16px rgba(37,99,235,0.35);
+        }
+
+        /* FILTER/SEARCH */
+        .filter-bar{
+            display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;
+            background:var(--surface);padding:14px 18px;border-radius:12px;
+            border:1px solid var(--border);box-shadow:var(--shadow);
+        }
+        .filter-bar input{
+            flex:1;min-width:260px;padding:10px 14px;
+            background:#ffffff;border:1px solid var(--border);
+            border-radius:8px;color:var(--text);font-size:.9rem;font-family:inherit;
+        }
+        .filter-bar input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.12);}
+        .filter-bar select{
+            padding:10px 14px;background:#ffffff;border:1px solid var(--border);
+            border-radius:8px;color:var(--text);font-size:.88rem;font-family:inherit;
+            cursor:pointer;
+        }
+        .filter-bar select:focus{outline:none;border-color:var(--primary);}
+
+        /* TABLE */
+        .schemes-table-wrap{
+            background:var(--surface);
+            border:1px solid var(--border);border-radius:14px;
+            overflow:hidden;box-shadow:var(--shadow);
+        }
+        .schemes-table{width:100%;border-collapse:collapse;}
+        .schemes-table th{
+            text-align:left;padding:14px 16px;font-size:.76rem;
+            text-transform:uppercase;letter-spacing:.6px;color:var(--text-secondary);
+            font-weight:700;background:var(--surface-subtle);
+            border-bottom:2px solid var(--border);
+        }
+        .schemes-table td{
+            padding:14px 16px;font-size:.88rem;
+            border-bottom:1px solid var(--border);
+            vertical-align:middle;
+        }
+        .schemes-table tr:last-child td{border-bottom:none;}
+        .schemes-table tr:hover td{background:#f8fafc;}
+
+        .scheme-name{font-weight:700;color:var(--navy-dark);max-width:320px;line-height:1.4;}
+        .scheme-name .tag{
+            display:inline-block;font-size:.72rem;font-weight:600;
+            padding:2px 8px;border-radius:6px;margin-left:6px;
+            background:var(--primary-light);color:var(--primary);
+            border:1px solid #bfdbfe;
+        }
+        .badge{
+            display:inline-block;padding:4px 10px;border-radius:6px;
+            font-size:.76rem;font-weight:600;
+        }
+        .badge-active{background:var(--success-light);color:var(--success);border:1px solid #bbf7d0;}
+        .badge-inactive{background:var(--danger-light);color:var(--danger);border:1px solid #fecaca;}
+        .badge-cat{background:var(--primary-light);color:var(--navy);border:1px solid #bfdbfe;}
+
+        .table-actions{display:flex;gap:8px;}
+        .table-actions form{display:inline;}
+        .btn-sm{
+            padding:6px 14px;border-radius:6px;border:none;
+            font-size:.8rem;font-weight:600;cursor:pointer;
+            font-family:inherit;transition:all .15s;text-decoration:none;
+            display:inline-flex;align-items:center;gap:4px;
+        }
+        .btn-edit{background:var(--primary-light);color:var(--primary);border:1px solid #bfdbfe;}
+        .btn-edit:hover{background:#dbeafe;color:var(--primary-hover);}
+        .btn-toggle{background:var(--surface-subtle);color:var(--text-secondary);border:1px solid var(--border);}
+        .btn-toggle:hover{background:#e2e8f0;color:var(--text);}
+        .btn-delete{background:#fef2f2;color:var(--danger);border:1px solid #fecaca;}
+        .btn-delete:hover{background:#fee2e2;}
+
+        /* RESPONSIVE */
+        @media(max-width:960px){
+            .admin-main{padding:18px;}
+            .schemes-table{font-size:.82rem;}
+            .schemes-table th,.schemes-table td{padding:10px 12px;}
+            .scheme-name{max-width:180px;}
+        }
+        @media(max-width:640px){
+            .admin-topbar{padding:12px 16px;}
+            .schemes-table-wrap{overflow-x:auto;}
+            .stats-row{grid-template-columns:1fr 1fr;}
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="admin-topbar">
+    <div class="brand">
+        <div class="brand-icon">✚</div>
+        <h1>SwasthyaSetu AI <span>Administrator Portal</span></h1>
+    </div>
+    <div class="user-actions">
+        <!-- Language Switcher: English, Hindi, Marathi -->
+        <div class="lang-picker-box" title="Select Language / भाषा निवडा / भाषा चुनें">
+            <span class="lang-globe">🌐</span>
+            <select class="portal-lang-select" onchange="changePortalLanguage(this.value)" aria-label="Select Language">
+                <option value="en">English</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="mr">मराठी (Marathi)</option>
+            </select>
+        </div>
+        <a href="/" target="_blank">Public Portal ↗</a>
+        <a href="{{ url_for('admin_scheme_new') }}" class="btn-add-top">+ Add Scheme</a>
+        <a href="{{ url_for('admin_logout') }}" class="btn-logout">Logout ({{ admin_user }})</a>
+    </div>
+</header>
+
+<main class="admin-main">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-bar">
+        {% for cat, msg in messages %}
+        <div class="flash-msg {{ cat }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="label">Total Schemes</div>
+            <div class="value">{{ stats.total or 0 }}</div>
+        </div>
+        <div class="stat-card green">
+            <div class="label">Active in Recommender</div>
+            <div class="value">{{ stats.active|int if stats.active else 0 }}</div>
+        </div>
+        <div class="stat-card amber">
+            <div class="label">Inactive / Drafts</div>
+            <div class="value">{{ (stats.total or 0) - (stats.active|int if stats.active else 0) }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Healthcare Categories</div>
+            <div class="value">{{ categories|length }}</div>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <h2>Government Schemes Catalogue ({{ schemes|length }})</h2>
+        <a href="{{ url_for('admin_scheme_new') }}" class="btn-add">+ Add New Scheme</a>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="filter-bar">
+        <input type="text" id="schemeSearch" placeholder="Search schemes by name, category, or region..." oninput="filterTable()">
+        <select id="categoryFilter" onchange="filterTable()">
+            <option value="">All Categories ({{ categories|length }})</option>
+            {% for cat in categories|sort %}
+            <option value="{{ cat }}">{{ cat }} ({{ categories[cat]|length }})</option>
+            {% endfor %}
+        </select>
+        <select id="statusFilter" onchange="filterTable()">
+            <option value="">All Statuses</option>
+            <option value="1">Active Only</option>
+            <option value="0">Inactive Only</option>
+        </select>
+    </div>
+
+    <!-- Table -->
+    <div class="schemes-table-wrap">
+        <table class="schemes-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Scheme Name</th>
+                    <th>Category</th>
+                    <th>Jurisdiction</th>
+                    <th>Applicable States</th>
+                    <th>Added By</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="schemesBody">
+                {% for s in schemes %}
+                <tr data-name="{{ s.name|lower }}" data-cat="{{ s.category }}" data-status="{{ s.is_active }}">
+                    <td style="color:var(--text-muted);font-weight:600;">{{ s.id }}</td>
+                    <td class="scheme-name">
+                        {{ s.name }}
+                        {% if s.short_tag %}<span class="tag">{{ s.short_tag }}</span>{% endif %}
+                    </td>
+                    <td><span class="badge badge-cat">{{ s.category }}</span></td>
+                    <td style="color:var(--text-secondary);font-size:.85rem;">{{ s.govt_level }}</td>
+                    <td style="color:var(--text-secondary);font-size:.85rem;">{{ s.states_applicable or 'All India' }}</td>
+                    <td><span class="badge" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;font-size:11px;font-weight:700;">👤 {{ s.added_by or 'Administrator' }}</span></td>
+                    <td>
+                        {% if s.is_active %}
+                        <span class="badge badge-active">Active</span>
+                        {% else %}
+                        <span class="badge badge-inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="table-actions">
+                        <a href="{{ url_for('admin_scheme_edit', scheme_id=s.id) }}" class="btn-sm btn-edit">Edit</a>
+                        <form method="POST" action="{{ url_for('admin_scheme_toggle', scheme_id=s.id) }}">
+                            <button type="submit" class="btn-sm btn-toggle">
+                                {% if s.is_active %}Disable{% else %}Enable{% endif %}
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('admin_scheme_delete', scheme_id=s.id) }}"
+                              onsubmit="return confirm('Permanently delete \'{{ s.name }}\'? This cannot be undone.')">
+                            <button type="submit" class="btn-sm btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+<script>
+function filterTable(){
+    const q = document.getElementById('schemeSearch').value.toLowerCase();
+    const cat = document.getElementById('categoryFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    const rows = document.querySelectorAll('#schemesBody tr');
+    rows.forEach(r => {
+        const matchName = r.dataset.name.includes(q);
+        const matchCat = !cat || r.dataset.cat === cat;
+        const matchStatus = !status || r.dataset.status === status;
+        r.style.display = (matchName && matchCat && matchStatus) ? '' : 'none';
+    });
+}
+</script>
+
+<!-- Language Switcher (Native, No Google Translate) -->
+<script src="{{ url_for('static', filename='language_switcher.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwasthyaSetu AI — Overview & Find the Right Healthcare Scheme for You</title>
+  <meta name="description" content="Discover government healthcare schemes, understand your eligibility, and get step-by-step guidance — all in one place.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    :root {
+      --primary: #1d72b8;
+      --primary-hover: #155b94;
+      --primary-light: #eef6fc;
+      --navy: #0f2d59;
+      --navy-dark: #091e3d;
+      --teal: #0d9488;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --surface: #ffffff;
+      --bg-soft: #f8fafc;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: #ffffff;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* TOP HEADER / NAVBAR */
+    .site-header {
+      background: #ffffff;
+      border-bottom: 1px solid #f1f5f9;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .header-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #0284c7, #0d9488);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      box-shadow: 0 4px 10px rgba(2,132,199,0.25);
+    }
+    .brand-text h1 {
+      font-size: 21px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+      font-family: 'Manrope', sans-serif;
+      line-height: 1.1;
+    }
+    .brand-text h1 span {
+      color: #0284c7;
+    }
+    .brand-text p {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 600;
+      margin-top: 1px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 600;
+      color: #475569;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--primary);
+    }
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 100%;
+      height: 2.5px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+    .nav-auth {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-login {
+      padding: 9px 24px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #334155;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .btn-login:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .btn-register {
+      padding: 9px 24px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      background: #1d72b8;
+      border: 1px solid #1d72b8;
+      border-radius: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(29,114,184,0.25);
+    }
+    .btn-register:hover {
+      background: #155b94;
+      border-color: #155b94;
+    }
+
+    /* SECTION 1: HERO SECTION */
+    .hero-section {
+      background: linear-gradient(180deg, #f0f7fd 0%, #ffffff 100%);
+      padding: 60px 24px 70px;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 50px;
+      align-items: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: #e1effe;
+      color: #1a56db;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      letter-spacing: 0.3px;
+    }
+    .hero-title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 46px;
+      line-height: 1.18;
+      font-weight: 800;
+      color: #0f2d59;
+      margin-bottom: 18px;
+      letter-spacing: -0.8px;
+    }
+    .hero-title .highlight {
+      color: #1d72b8;
+    }
+    .hero-desc {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #475569;
+      margin-bottom: 34px;
+      max-width: 540px;
+    }
+    .hero-features-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 34px;
+    }
+    .hero-feature-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .feature-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .feature-icon-box.blue { background: #e0f2fe; color: #0284c7; }
+    .feature-icon-box.teal { background: #e0f7f6; color: #0d9488; }
+    .feature-icon-box.green { background: #dcfce7; color: #16a34a; }
+    .feature-icon-box.rose { background: #ffe4e6; color: #e11d48; }
+
+    .hero-feature-item span {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #334155;
+      line-height: 1.35;
+    }
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-hero-primary {
+      padding: 13px 30px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      background: #1d72b8;
+      border-radius: 8px;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(29,114,184,0.3);
+      transition: all 0.2s;
+    }
+    .btn-hero-primary:hover {
+      background: #155b94;
+      transform: translateY(-1px);
+    }
+    .btn-hero-secondary {
+      padding: 13px 26px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1d72b8;
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .btn-hero-secondary:hover {
+      background: #f0f7ff;
+      border-color: #93c5fd;
+    }
+
+    /* HERO IMAGE WRAPPER */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .hero-visual-card {
+      position: relative;
+      width: 100%;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 20px 45px -10px rgba(15,45,89,0.15);
+      border: 6px solid #ffffff;
+    }
+    .hero-visual-card img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+      display: block;
+    }
+    .visual-handwrite {
+      position: absolute;
+      top: 14px;
+      right: 20px;
+      font-family: 'Caveat', cursive;
+      font-size: 26px;
+      color: #1d72b8;
+      transform: rotate(6deg);
+      line-height: 1.1;
+      text-align: right;
+      text-shadow: 1px 1px 0 #fff;
+    }
+    .pulse-line {
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      width: 90px;
+      height: 40px;
+    }
+
+    /* SECTION 2: POPULAR SCHEMES CATEGORIES */
+    .section-schemes {
+      padding: 80px 24px;
+      background: #ffffff;
+    }
+    .section-container {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+    .section-header-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      gap: 20px;
+    }
+    .section-eyebrow {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #1d72b8;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .section-heading {
+      font-family: 'Manrope', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #0f2d59;
+      line-height: 1.25;
+      letter-spacing: -0.5px;
+    }
+    .section-subheading {
+      font-size: 15px;
+      color: #64748b;
+      margin-top: 6px;
+      max-width: 650px;
+    }
+    .btn-view-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 20px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1d72b8;
+      background: #ffffff;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-view-all:hover {
+      border-color: #1d72b8;
+      background: #f0f7ff;
+    }
+
+    .schemes-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+    }
+    .scheme-cat-card {
+      background: #ffffff;
+      border: 1px solid #edf2f7;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 200px;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .scheme-cat-card:hover {
+      border-color: #bfdbfe;
+      box-shadow: 0 12px 28px -6px rgba(29,114,184,0.12);
+      transform: translateY(-3px);
+    }
+    .cat-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 18px;
+    }
+    .cat-icon-wrap.c-blue { background: #eff6ff; color: #2563eb; }
+    .cat-icon-wrap.c-pink { background: #fdf2f8; color: #db2777; }
+    .cat-icon-wrap.c-purple { background: #faf5ff; color: #9333ea; }
+    .cat-icon-wrap.c-green { background: #ecfdf5; color: #059669; }
+    .cat-icon-wrap.c-orange { background: #fff7ed; color: #ea580c; }
+    .cat-icon-wrap.c-teal { background: #f0fdfa; color: #0d9488; }
+    .cat-icon-wrap.c-indigo { background: #eef2ff; color: #4f46e5; }
+    .cat-icon-wrap.c-map { background: #eff6ff; color: #1d72b8; }
+
+    .scheme-cat-card h3 {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+    .scheme-cat-card p {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.45;
+      margin-bottom: 16px;
+    }
+    .card-footer-arrow {
+      align-self: flex-end;
+      color: #1d72b8;
+      font-size: 16px;
+      font-weight: 700;
+      transition: transform 0.2s;
+    }
+    .scheme-cat-card:hover .card-footer-arrow {
+      transform: translateX(3px);
+    }
+
+    /* SECTION 3: HOW SWASTHYASETU AI WORKS */
+    .section-how {
+      padding: 80px 24px;
+      background: #f8fafc;
+      border-top: 1px solid #f1f5f9;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .steps-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 46px;
+      position: relative;
+    }
+    .step-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 30px 24px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .step-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    .step-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .step-icon-circle.step-1 { background: #e0f2fe; color: #0284c7; }
+    .step-icon-circle.step-2 { background: #dcfce7; color: #16a34a; }
+    .step-icon-circle.step-3 { background: #f3e8ff; color: #9333ea; }
+    .step-icon-circle.step-4 { background: #ffedd5; color: #ea580c; }
+
+    .step-number-pill {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      font-family: 'Manrope', sans-serif;
+    }
+    .step-card h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 10px;
+      font-family: 'Manrope', sans-serif;
+    }
+    .step-card p {
+      font-size: 13.5px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    .step-divider-arrow {
+      position: absolute;
+      top: 50%;
+      right: -16px;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-size: 14px;
+      z-index: 2;
+    }
+
+    /* SECTION 4: CALL TO ACTION BANNER */
+    .section-cta {
+      padding: 70px 24px;
+      background: #ffffff;
+    }
+    .cta-card {
+      max-width: 1240px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+      border-radius: 24px;
+      border: 1px solid #bbf7d0;
+      padding: 50px 54px;
+      display: grid;
+      grid-template-columns: 0.8fr 1.3fr 0.9fr;
+      gap: 36px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-illustration {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .clipboard-icon-box {
+      width: 110px;
+      height: 130px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(13,148,136,0.12);
+      border: 3px solid #38bdf8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .clipboard-clip {
+      position: absolute;
+      top: -12px;
+      width: 44px;
+      height: 18px;
+      background: #0284c7;
+      border-radius: 6px;
+    }
+    .clipboard-cross {
+      font-size: 38px;
+      color: #0284c7;
+      font-weight: 800;
+    }
+    .cta-handwrite {
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      font-family: 'Caveat', cursive;
+      font-size: 24px;
+      color: #0f766e;
+      transform: rotate(4deg);
+      line-height: 1.1;
+    }
+
+    .cta-content .cta-tag {
+      font-size: 11.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #0284c7;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+    .cta-content h2 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #0f2d59;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .cta-content p {
+      font-size: 14.5px;
+      color: #475569;
+      margin-bottom: 24px;
+      max-width: 460px;
+    }
+    .cta-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn-cta-register {
+      padding: 12px 28px;
+      background: #1d72b8;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14.5px;
+      border-radius: 8px;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(29,114,184,0.25);
+    }
+    .btn-cta-register:hover {
+      background: #155b94;
+    }
+    .btn-cta-learn {
+      padding: 12px 24px;
+      background: #ffffff;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      font-weight: 600;
+      font-size: 14.5px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .btn-cta-learn:hover {
+      background: #f8fafc;
+    }
+
+    .cta-trust-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border-left: 1px dashed #93c5fd;
+      padding-left: 30px;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .trust-item-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #dbeafe;
+      color: #1d72b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    /* FOOTER */
+    .site-footer {
+      background: #0b1a30;
+      color: #cbd5e1;
+      padding: 28px 24px;
+      border-top: 1px solid #1e293b;
+    }
+    .footer-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Manrope', sans-serif;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: #94a3b8;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover {
+      color: #ffffff;
+    }
+    .footer-tagline {
+      font-size: 12px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .hero-container {
+        grid-template-columns: 1fr;
+      }
+      .schemes-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .steps-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .cta-card {
+        grid-template-columns: 1fr;
+      }
+      .cta-trust-list {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px dashed #93c5fd;
+        padding-top: 20px;
+      }
+    }
+    @media (max-width: 640px) {
+      .hero-title {
+        font-size: 34px;
+      }
+      .schemes-grid, .steps-row {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        display: none;
+      }
+      .hero-features-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Language Switcher */
+    .lang-picker-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 9px;
+      padding: 5px 12px;
+      box-shadow: 0 1px 4px rgba(16, 43, 82, 0.05);
+      transition: all 0.2s ease;
+    }
+    .lang-picker-box:hover {
+      border-color: #2563eb;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+    }
+    .lang-globe {
+      font-size: 13px;
+      line-height: 1;
+    }
+    .portal-lang-select {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e3a8a;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .portal-lang-select option {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    /* Native language switcher — no Google Translate needed */
+  </style>
+</head>
+<body>
+
+  <!-- TOP HEADER / NAVBAR -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo-icon">✚</div>
+        <div class="brand-text">
+          <h1>SwasthyaSetu <span>AI</span></h1>
+          <p>Your Health &middot; Our Support &middot; Government Schemes</p>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="/" class="active" data-i18n="nav.home">Home</a></li>
+        <li><a href="{{ url_for('schemes') }}" data-i18n="nav.schemes">Schemes</a></li>
+        <li><a href="#how-it-works" data-i18n="nav.about">About</a></li>
+        <li><a href="{{ url_for('assistant') }}" data-i18n="nav.help">Help</a></li>
+      </ul>
+
+      <div class="nav-auth" style="display:flex;align-items:center;gap:12px;">
+        <!-- Language Switcher: English, Hindi, Marathi -->
+        <div class="lang-picker-box" title="Select Portal Language / भाषा निवडा / भाषा चुनें">
+          <span class="lang-globe">🌐</span>
+          <select class="portal-lang-select" onchange="changePortalLanguage(this.value)" aria-label="Select Portal Language">
+            <option value="en">English</option>
+            <option value="hi">हिंदी (Hindi)</option>
+            <option value="mr">मराठी (Marathi)</option>
+          </select>
+        </div>
+
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('profile_view') }}" class="btn-register" data-i18n="nav.go_profile">Go to Profile</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn-login" data-i18n="nav.login">Login</a>
+          <a href="{{ url_for('register') }}" class="btn-register" data-i18n="nav.register">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE 1 / SECTION 1: HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-container">
+      
+      <div class="hero-text-col">
+        <span class="hero-badge" data-i18n="hero.badge">Government Healthcare Schemes</span>
+        <h1 class="hero-title">
+          <span data-i18n="hero.title1">Find the Right</span> <span class="highlight"><span data-i18n="hero.title2">Healthcare Scheme</span></span> <span data-i18n="hero.title3">for You</span>
+        </h1>
+        <p class="hero-desc" data-i18n="hero.desc">
+          SwasthyaSetu AI helps you discover government healthcare schemes, understand your eligibility, and get the support you need.
+        </p>
+
+        <!-- 4 Key Mini Highlights -->
+        <div class="hero-features-row">
+          <div class="hero-feature-item">
+            <div class="feature-icon-box blue">🔍</div>
+            <span data-i18n="hero.feat1">Discover Relevant Schemes</span>
+          </div>
+          <div class="hero-feature-item">
+            <div class="feature-icon-box teal">📄</div>
+            <span data-i18n="hero.feat2">Check Eligibility Criteria</span>
+          </div>
+          <div class="hero-feature-item">
+            <div class="feature-icon-box green">☑️</div>
+            <span data-i18n="hero.feat3">See Required Documents</span>
+          </div>
+          <div class="hero-feature-item">
+            <div class="feature-icon-box rose">❤️</div>
+            <span data-i18n="hero.feat4">Get Step-by-Step Guidance</span>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="hero-cta-group">
+          <a href="{{ url_for('login') }}" class="btn-hero-primary">
+            <span data-i18n="hero.btn_start">Get Started</span> <span>→</span>
+          </a>
+          <a href="{{ url_for('schemes') }}" class="btn-hero-secondary" data-i18n="hero.btn_explore">
+            Explore Schemes
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Visual Column -->
+      <div class="hero-visual">
+        <div class="hero-visual-card">
+          <img src="{{ url_for('static', filename='images/hero_family.jpg') }}" alt="Happy Indian family exploring healthcare schemes">
+          <div class="visual-handwrite" data-i18n="hero.visual_text">
+            Better Healthcare for a Brighter Tomorrow
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PAGE 2 / SECTION 2: POPULAR SCHEMES CATEGORIES -->
+  <section class="section-schemes" id="schemes-section">
+    <div class="section-container">
+      
+      <div class="section-header-row">
+        <div>
+          <span class="section-eyebrow" data-i18n="sec.schemes.eyebrow">Explore Schemes</span>
+          <h2 class="section-heading" data-i18n="sec.schemes.heading">Popular Government Healthcare Schemes</h2>
+          <p class="section-subheading" data-i18n="sec.schemes.sub">
+            Find schemes matching your healthcare needs.
+          </p>
+        </div>
+        <div>
+          <a href="{{ url_for('schemes') }}" class="btn-view-all">
+            <span data-i18n="sec.schemes.viewall">View All Schemes</span> <span>→</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="schemes-grid">
+        
+        <!-- Card 1 -->
+        <a href="{{ url_for('schemes') }}" class="scheme-cat-card">
+          <div>
+            <div class="cat-icon-wrap c-blue">🏥</div>
+            <h3 data-i18n="cat.card1.title">Health Insurance and Hospitalization</h3>
+            <p data-i18n="cat.card1.desc">Get financial protection for major medical treatments and surgeries.</p>
+          </div>
+          <div class="card-footer-arrow">→</div>
+        </a>
+
+        <!-- Card 2 -->
+        <a href="{{ url_for('schemes') }}" class="scheme-cat-card">
+          <div>
+            <div class="cat-icon-wrap c-pink">🎗️</div>
+            <h3 data-i18n="cat.card2.title">Serious Diseases and Financial Assistance</h3>
+            <p data-i18n="cat.card2.desc">Support for cancer, kidney disease, heart care.</p>
+          </div>
+          <div class="card-footer-arrow">→</div>
+        </a>
+
+        <!-- Card 3 -->
+        <a href="{{ url_for('schemes') }}" class="scheme-cat-card">
+          <div>
+            <div class="cat-icon-wrap c-purple">🤰</div>
+            <h3 data-i18n="cat.card3.title">Pregnancy and Maternity Care</h3>
+            <p data-i18n="cat.card3.desc">Safe mother and healthy baby programmes.</p>
+          </div>
+          <div class="card-footer-arrow">→</div>
+        </a>
+
+        <!-- Card 4 -->
+        <a href="{{ url_for('schemes') }}" class="scheme-cat-card">
+          <div>
+            <div class="cat-icon-wrap c-green">👶</div>
+            <h3 data-i18n="cat.card4.title">Child Healthcare and Immunization</h3>
+            <p data-i18n="cat.card4.desc">Vaccination, nutritional screening, and child wellness programmes.</p>
+          </div>
+          <div class="card-footer-arrow">→</div>
+        </a>
+
+        <!-- Card 5 -->
+        <a href="{{ url_for('schemes') }}" class="scheme-cat-card">
+          <div>
+            <div class="cat-icon-wrap c-orange">🧓</div>
+            <h3 data-i18n="cat.card5.title">Senior Citizens and Disability</h3>
+            <p data-i18n="cat.card5.desc">Special care and aids for elders and differently abled.</p>
+          </div>
+          <div class="card-footer-arrow">→</div>
+        </a>
+
+        <!-- Card 6 -->
+        <a href="{{ url_for('schemes') }}" class="scheme-cat-card">
+          <div>
+            <div class="cat-icon-wrap c-teal">💊</div>
+            <h3 data-i18n="cat.card6.title">Medicines, Diagnostics and Dialysis</h3>
+            <p data-i18n="cat.card6.desc">Generic medicines, free lab tests, and dialysis sessions.</p>
+          </div>
+          <div class="card-footer-arrow">→</div>
+        </a>
+
+        <!-- Card 7 -->
+        <a href="{{ url_for('schemes') }}" class="scheme-cat-card">
+          <div>
+            <div class="cat-icon-wrap c-indigo">🧠</div>
+            <h3 data-i18n="cat.card7.title">Mental Health and Chronic Diseases</h3>
+            <p data-i18n="cat.card7.desc">Counseling, diabetes, hypertension and mental wellness.</p>
+          </div>
+          <div class="card-footer-arrow">→</div>
+        </a>
+
+        <!-- Card 8 -->
+        <a href="{{ url_for('schemes') }}" class="scheme-cat-card">
+          <div>
+            <div class="cat-icon-wrap c-map">🗺️</div>
+            <h3>State-Specific Schemes</h3>
+            <p>Healthcare benefits and localized welfare schemes available in your state.</p>
+          </div>
+          <div class="card-footer-arrow">→</div>
+        </a>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PAGE 3 / SECTION 3: HOW SWASTHYASETU AI WORKS -->
+  <section class="section-how" id="how-it-works">
+    <div class="section-container">
+      
+      <div>
+        <span class="section-eyebrow">Simple Steps</span>
+        <h2 class="section-heading">How SwasthyaSetu AI Works</h2>
+        <p class="section-subheading">
+          Get personalized scheme recommendations in just a few simple steps.
+        </p>
+      </div>
+
+      <div class="steps-row">
+        
+        <!-- Step 1 -->
+        <div class="step-card">
+          <div class="step-badge-row">
+            <div class="step-icon-circle step-1">👤</div>
+            <div class="step-number-pill">1</div>
+          </div>
+          <h3>Register</h3>
+          <p>Create your account with basic information like name, state, and district.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+          <div class="step-badge-row">
+            <div class="step-icon-circle step-2">📝</div>
+            <div class="step-number-pill">2</div>
+          </div>
+          <h3>Complete Profile (Optional)</h3>
+          <p>Add more details whenever you're ready to unlock tailored eligibility scoring.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+          <div class="step-badge-row">
+            <div class="step-icon-circle step-3">⚙️</div>
+            <div class="step-number-pill">3</div>
+          </div>
+          <h3>Get Recommendations</h3>
+          <p>We match you with the most relevant schemes you are eligible for.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card">
+          <div class="step-badge-row">
+            <div class="step-icon-circle step-4">🧡</div>
+            <div class="step-number-pill">4</div>
+          </div>
+          <h3>Apply &amp; Benefit</h3>
+          <p>Follow the checklist steps, locate empanelled hospitals, and access your benefits.</p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 4: CALL TO ACTION BANNER -->
+  <section class="section-cta">
+    <div class="cta-card">
+      
+      <div class="cta-illustration">
+        <div class="clipboard-icon-box">
+          <div class="clipboard-clip"></div>
+          <div class="clipboard-cross">✚</div>
+        </div>
+        <div class="cta-handwrite">
+          Your Health<br>Our Priority ♡
+        </div>
+      </div>
+
+      <div class="cta-content">
+        <span class="cta-tag">Get Started Today</span>
+        <h2>Your Health Matters.<br>We're Here to Help.</h2>
+        <p>Join SwasthyaSetu AI and take the first step towards better healthcare and financial security.</p>
+        <div class="cta-actions">
+          <a href="{{ url_for('login') }}" class="btn-cta-register">
+            Register Now <span>→</span>
+          </a>
+          <a href="{{ url_for('schemes') }}" class="btn-cta-learn">Learn More</a>
+        </div>
+      </div>
+
+      <div class="cta-trust-list">
+        <div class="trust-item">
+          <span class="trust-item-icon">✓</span>
+          <span>Trusted Government Schemes</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item-icon">🔒</span>
+          <span>Secure &amp; Private</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item-icon">⏱️</span>
+          <span>Easy to Use</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item-icon">📍</span>
+          <span>Available Across India</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span>✚</span> SwasthyaSetu AI
+      </div>
+
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+        <li><a href="#how-it-works">About</a></li>
+        <li><a href="{{ url_for('assistant') }}">Help</a></li>
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+      </ul>
+
+      <div class="footer-tagline">
+        Together for a Healthier India ♡
+      </div>
+    </div>
+  </footer>
+
+  <!-- Language Switcher (Native, No Google Translate) -->
+  <script src="{{ url_for('static', filename='language_switcher.js') }}"></script>
+</body>
+</html>

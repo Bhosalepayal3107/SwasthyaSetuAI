@@ -1002,4 +1002,6 @@ def tracking():
     return page("tracking.html", "tracking", "Application Tracker", application_id=application_id)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)

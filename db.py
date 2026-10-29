@@ -28,15 +28,17 @@ _DB_TYPE = os.environ.get("DB_TYPE", "sqlite").strip().lower()
 _PG_AVAILABLE = False
 _PG_CONN_PARAMS = {}
 
-if _DB_TYPE == "postgres":
+_db_url = os.environ.get("DATABASE_URL")
+if _DB_TYPE == "postgres" or _db_url:
     try:
         import psycopg2
         from psycopg2.extras import RealDictCursor
 
-        _db_url = os.environ.get("DATABASE_URL")
         if _db_url:
-            # Quick connection test
-            _test = psycopg2.connect(_db_url, connect_timeout=3)
+            # Fix Render postgres:// URI prefix for psycopg2 compatibility
+            if _db_url.startswith("postgres://"):
+                _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+            _test = psycopg2.connect(_db_url, connect_timeout=5)
             _test.close()
             _PG_CONN_PARAMS = {"dsn": _db_url}
         else:
@@ -317,6 +319,74 @@ def _init_postgres():
                     (email_val, uname_val, "admin@123")
                 )
             rcur.close()
+
+        # Auto-seed default schemes from SCHEME_CATALOGUE if table is empty (e.g. fresh Render deployment)
+        cur.execute("SELECT COUNT(*) FROM schemes")
+        cnt = cur.fetchone()
+        num_schemes = cnt[0] if isinstance(cnt, tuple) else (cnt.get("count", 0) if cnt else 0)
+        if num_schemes == 0:
+            print("[db] Fresh database detected. Seeding 315 schemes into PostgreSQL...")
+            from scheme_catalogue import SCHEME_CATALOGUE
+            for s in SCHEME_CATALOGUE:
+                cur.execute("""
+                    INSERT INTO schemes
+                        (name, short_tag, category, govt_level, description, who_benefits,
+                         eligibility_rules, required_documents, benefits_text, covered_treatments,
+                         official_website, application_process, states_applicable,
+                         age_min, age_max, income_limit, match_tags, is_active, color, added_by)
+                    VALUES
+                        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    s.get("name", ""),
+                    s.get("short_tag", ""),
+                    s.get("category", "General"),
+                    s.get("govt_level", "Central Government"),
+                    s.get("description", ""),
+                    s.get("who_benefits", ""),
+                    json.dumps(s.get("eligibility_rules", [])),
+                    json.dumps(s.get("required_documents", [])),
+                    s.get("benefits_text", ""),
+                    json.dumps(s.get("covered_treatments", [])),
+                    s.get("official_website", "https://mohfw.gov.in/"),
+                    s.get("application_process", ""),
+                    s.get("states_applicable", "All"),
+                    s.get("age_min", 0),
+                    s.get("age_max", 120),
+                    s.get("income_limit", "No income limit"),
+                    json.dumps(s.get("match_tags", [])),
+                    1,
+                    s.get("color", "blue"),
+                    s.get("added_by", "Administrator")
+                ))
+            print("[db] OK Auto-seeded 315 schemes.")
+
+        # Auto-seed default empanelled hospitals if table is empty
+        cur.execute("SELECT COUNT(*) FROM empanelled_hospitals")
+        hcnt = cur.fetchone()
+        num_hospitals = hcnt[0] if isinstance(hcnt, tuple) else (hcnt.get("count", 0) if hcnt else 0)
+        if num_hospitals == 0:
+            default_hospitals = [
+                ("All India Institute of Medical Sciences (AIIMS)", "Central Government Apex Hospital", "Delhi", "New Delhi", "New Delhi", "Sri Aurobindo Marg, Ansari Nagar", "110029", "011-26588500", "102 / 108", json.dumps(["PM-JAY", "CGHS", "RAN", "Universal Access"]), 2478, 120, 24, 80, json.dumps(["Oncology", "Cardiology", "Neurology", "Nephrology", "Organ Transplant"]), 28.5672, 77.2100, 4.2),
+                ("Tata Memorial Hospital", "Autonomous Cancer Care Institute", "Maharashtra", "Mumbai", "Mumbai", "Dr. E Borges Road, Parel", "400012", "022-24177000", "022-24177000", json.dumps(["PM-JAY", "MJPJAY", "RAN", "HMDG"]), 700, 35, 12, 45, json.dumps(["Medical Oncology", "Surgical Oncology", "Radiation Oncology", "Bone Marrow Transplant"]), 19.0028, 72.8427, 3.8),
+                ("Postgraduate Institute of Medical Education and Research (PGIMER)", "Central Autonomous Institute", "Chandigarh", "Chandigarh", "Chandigarh", "Sector 12", "160012", "0172-2747585", "108", json.dumps(["PM-JAY", "CGHS", "Universal Access"]), 1948, 85, 18, 60, json.dumps(["Cardiology", "Neurosurgery", "Renal Transplant", "Pediatrics"]), 30.7634, 76.7821, 5.1),
+                ("King Edward Memorial (KEM) Hospital", "Municipal Corporation Super-Specialty", "Maharashtra", "Mumbai", "Mumbai", "Acharya Donde Marg, Parel", "400012", "022-24107000", "108", json.dumps(["MJPJAY", "PM-JAY", "National Dialysis"]), 1800, 90, 15, 50, json.dumps(["Emergency Medicine", "General Surgery", "Cardiology", "Dialysis", "Burn Care"]), 19.0033, 72.8411, 2.1),
+                ("NIMHANS (National Institute of Mental Health and Neuro-Sciences)", "National Institute of Eminence", "Karnataka", "Bengaluru Urban", "Bengaluru", "Hosur Road", "560029", "080-26995000", "080-46110007 (Kiran)", json.dumps(["PM-JAY", "Tele-MANAS", "National Mental Health"]), 850, 40, 8, 20, json.dumps(["Psychiatry", "Neurology", "Neurosurgery", "Addiction Medicine"]), 12.9372, 77.5956, 3.5),
+                ("Sanjay Gandhi Postgraduate Institute of Medical Sciences (SGPGIMS)", "State Autonomous Apex Center", "Uttar Pradesh", "Lucknow", "Lucknow", "Raebareli Road", "226014", "0522-2668700", "108", json.dumps(["PM-JAY", "State Illness Assistance"]), 1200, 60, 14, 40, json.dumps(["Gastroenterology", "Endocrinology", "Cardiovascular", "Nephrology"]), 26.7497, 80.9388, 6.2),
+                ("Chhatrapati Shivaji Maharaj General Hospital & Rajiv Gandhi Medical College", "Municipal Medical College Hospital", "Maharashtra", "Thane", "Thane", "Kalwa", "400605", "022-25372338", "108", json.dumps(["MJPJAY", "PM-JAY", "Janani Shishu Suraksha"]), 500, 45, 6, 25, json.dumps(["General Medicine", "Obstetrics & Gynecology", "Pediatrics", "Trauma Care"]), 19.1973, 72.9866, 1.8),
+                ("Government Medical College and Hospital (GMCH)", "State Government Medical Center", "Maharashtra", "Nagpur", "Nagpur", "Hanuman Nagar", "440003", "0712-2744671", "108", json.dumps(["MJPJAY", "PM-JAY", "National Dialysis"]), 1400, 70, 10, 35, json.dumps(["Cardiology", "Dialysis", "Orthopedics", "General Surgery"]), 21.1272, 79.0964, 4.0),
+                ("District Civil Hospital Nashik", "State Civil Hospital", "Maharashtra", "Nashik", "Nashik", "Trimbak Road", "422002", "0253-2576106", "108", json.dumps(["MJPJAY", "PM-JAY", "National TB Elimination"]), 650, 50, 8, 30, json.dumps(["General Surgery", "Maternity", "Pediatric ICU", "Emergency Care"]), 19.9975, 73.7898, 2.5),
+                ("District General Hospital Pune (Aundh)", "District Hospital", "Maharashtra", "Pune", "Pune", "Aundh Chest Hospital Campus", "411027", "020-27282255", "108", json.dumps(["MJPJAY", "PM-JAY", "National Dialysis"]), 450, 35, 5, 20, json.dumps(["Chest Diseases", "Dialysis", "General Medicine", "Gynecology"]), 18.5714, 73.8058, 3.1)
+            ]
+            for h in default_hospitals:
+                cur.execute("""
+                    INSERT INTO empanelled_hospitals
+                        (name, hospital_type, state, district, city, address, pincode, phone, emergency_helpline,
+                         schemes_empanelled, total_capacity, general_beds_available, icu_beds_available, oxygen_beds_available,
+                         specialties, latitude, longitude, distance_km)
+                    VALUES
+                        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, h)
+            print("[db] OK Auto-seeded 10 empanelled hospitals.")
 
         conn.commit()
     finally:

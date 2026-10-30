@@ -2,6 +2,7 @@ services:
   - type: web
     name: swasthyasetu-ai
     runtime: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
@@ -9,15 +10,3 @@ services:
         value: 3.11.9
       - key: SECRET_KEY
         generateValue: true
-      - key: DB_TYPE
-        value: postgres
-      - key: DATABASE_URL
-        fromDatabase:
-          name: swasthyasetu-db
-          property: connectionString
-
-databases:
-  - name: swasthyasetu-db
-    databaseName: swasthyasetu
-    user: swasthyasetu_user
-    plan: free

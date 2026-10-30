@@ -18,18 +18,19 @@
 </div>
 
 <!-- PROFILE COMPLETION PROGRESS BAR -->
+{% set cpct = (profile.get('completion_pct', 20) if profile else 20) %}
 <div class="panel" style="margin-bottom:24px;padding:18px 24px;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
     <div>
       <span style="font-size:11px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:0.5px;">Core Profile Completion</span>
-      <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin:2px 0 0;">{{ profile.completion_pct }}% Profile Information Provided</h3>
+      <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin:2px 0 0;">{{ cpct }}% Profile Information Provided</h3>
     </div>
     <span class="status-pill" style="background:#eff6ff;color:#1e40af;font-size:11px;font-weight:700;">
-      Level: {% if profile.completion_pct >= 80 %}Complete{% elif profile.completion_pct >= 50 %}Moderate{% else %}Initial{% endif %}
+      Level: {% if cpct >= 80 %}Complete{% elif cpct >= 50 %}Moderate{% else %}Initial{% endif %}
     </span>
   </div>
   <div style="height:8px;background:#e2e8f0;border-radius:10px;overflow:hidden;">
-    <div style="height:100%;width:{{ profile.completion_pct }}%;background:linear-gradient(90deg,#2563eb,#3b82f6);border-radius:10px;transition:width 0.3s ease;"></div>
+    <div style="height:100%;width:{{ cpct }}%;background:linear-gradient(90deg,#2563eb,#3b82f6);border-radius:10px;transition:width 0.3s ease;"></div>
   </div>
   <p style="font-size:11px;color:#64748b;margin:8px 0 0;">
     Your personal and demographic data is saved securely in your profile and enables fast, personalized healthcare benefit checks.

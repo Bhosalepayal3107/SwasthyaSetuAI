@@ -70,10 +70,10 @@
     {% if session.get('user_id') %}
     <div class="profile" style="position:relative;">
       <div class="avatar" style="background:#2563eb;color:#ffffff;font-weight:700;">
-        {{ session.get('user_name', 'U')[0]|upper }}
+        {{ (session.get('user_name') or 'U')[0]|upper }}
       </div>
       <div style="flex:1;overflow:hidden;">
-        <b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ session.get('user_name', 'Beneficiary') }}</b>
+        <b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ session.get('user_name') or 'Beneficiary' }}</b>
         <small style="color:#64748b;">
           <a href="{{ url_for('logout') }}" style="color:#ef4444;text-decoration:none;font-weight:600;">Log out</a>
         </small>
@@ -112,7 +112,7 @@
             Log out
           </a>
           <div class="avatar small" style="background:#2563eb;color:#ffffff;font-weight:700;">
-            {{ session.get('user_name', 'U')[0]|upper }}
+            {{ (session.get('user_name') or 'U')[0]|upper }}
           </div>
         {% else %}
           <a href="{{ url_for('login') }}" class="btn btn-outline btn-sm" style="font-size:11px;padding:5px 14px;">

@@ -22,12 +22,12 @@
 <div class="page-heading">
   <div>
     <p class="eyebrow">YOUR PERSONALIZED HEALTHCARE WORKSPACE &middot; My Healthcare Dashboard</p>
-    <h1>Welcome, {{ user.name.split()[0] }}! <span class="wave">✦</span></h1>
+    <h1>Welcome, {{ user.name.split()[0] if user and user.name else 'Beneficiary' }}! <span class="wave">✦</span></h1>
     <p class="subheading">Discover government healthcare schemes that may match your needs. Start with your basic information and complete your profile whenever you are ready.</p>
   </div>
   <div class="heading-actions no-print">
     <a href="{{ url_for('profile_view') }}" class="btn btn-primary btn-sm">
-      ✏️ {% if profile.completion_pct < 80 %}Complete My Profile{% else %}Edit Profile{% endif %}
+      ✏️ {% if (profile.get('completion_pct', 20) if profile else 20) < 80 %}Complete My Profile{% else %}Edit Profile{% endif %}
     </a>
     <a href="{{ url_for('schemes') }}" class="btn btn-outline btn-sm">
       ⌕ Scheme Finder
@@ -42,20 +42,20 @@
       <div style="display:flex;align-items:center;gap:10px;">
         <span style="font-size:11px;font-weight:700;letter-spacing:1px;color:#2563eb;text-transform:uppercase;">Profile Readiness</span>
         <span class="status-pill" style="background:#eff6ff;color:#1e40af;font-size:11px;font-weight:700;">
-          {{ profile.completion_pct }}% Complete
+          {{ (profile.get('completion_pct', 20) if profile else 20) }}% Complete
         </span>
       </div>
       <h3 style="font-size:16px;font-weight:800;margin:6px 0 2px;color:#0f172a;font-family:'Manrope',sans-serif;">
-        {% if profile.completion_pct <= 25 %}
+        {% if (profile.get('completion_pct', 20) if profile else 20) <= 25 %}
           Your profile is just getting started
-        {% elif profile.completion_pct < 70 %}
+        {% elif (profile.get('completion_pct', 20) if profile else 20) < 70 %}
           Good progress on your profile
         {% else %}
           Comprehensive profile ready
         {% endif %}
       </h3>
       <p style="font-size:12px;color:#64748b;margin:0;">
-        {% if profile.completion_pct < 80 %}
+        {% if (profile.get('completion_pct', 20) if profile else 20) < 80 %}
           Add a few details (medical needs, household criteria) to receive more tailored scheme recommendations.
         {% else %}
           Your profile has enough details for high-confidence scheme candidate matching.
@@ -64,14 +64,14 @@
     </div>
     <div style="display:flex;gap:10px;">
       <a href="{{ url_for('profile_view') }}" class="btn btn-primary btn-sm" style="padding:10px 18px;">
-        {% if profile.completion_pct < 80 %}Complete My Profile →{% else %}Review Profile{% endif %}
+        {% if (profile.get('completion_pct', 20) if profile else 20) < 80 %}Complete My Profile →{% else %}Review Profile{% endif %}
       </a>
     </div>
   </div>
 
   <!-- Visual Progress Bar -->
   <div style="height:8px;background:#e2e8f0;border-radius:10px;overflow:hidden;margin-top:10px;">
-    <div style="height:100%;width:{{ profile.completion_pct }}%;background:linear-gradient(90deg,#2563eb,#3b82f6);border-radius:10px;transition:width 0.4s ease;"></div>
+    <div style="height:100%;width:{{ (profile.get('completion_pct', 20) if profile else 20) }}%;background:linear-gradient(90deg,#2563eb,#3b82f6);border-radius:10px;transition:width 0.4s ease;"></div>
   </div>
 
   <!-- Profile Checklist Preview -->

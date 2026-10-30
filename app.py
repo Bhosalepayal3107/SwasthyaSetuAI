@@ -1,3 +1,34 @@
+import sys
+import os
+
+# -----------------------------------------------------------------------
+# Auto-upgrade trampoline: if this file is being executed by Python < 3.8
+# (e.g. the old Python 3.6 on PATH), re-launch with Python 3.12 / .venv.
+# Uses subprocess.call (Windows-safe) then sys.exit so Python 3.6 stops.
+# This block runs at import time so it fires even inside Flask's reloader.
+# -----------------------------------------------------------------------
+if sys.version_info < (3, 8):
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    _py312_venv = os.path.join(_dir, ".venv", "Scripts", "python.exe")
+    _py312_sys = os.path.expandvars(r"%LOCALAPPDATA%\Programs\Python\Python312\python.exe")
+    _target_py = None
+    if os.path.exists(_py312_venv):
+        _target_py = _py312_venv
+    elif os.path.exists(_py312_sys):
+        _target_py = _py312_sys
+
+    if _target_py:
+        import subprocess
+        print("[HealthSahayAI] Detected Python {}.{} — requires 3.8+.".format(
+            sys.version_info.major, sys.version_info.minor), flush=True)
+        print("[HealthSahayAI] Re-launching with: " + _target_py, flush=True)
+        _ret = subprocess.call([_target_py, os.path.abspath(__file__)] + sys.argv[1:])
+        sys.exit(_ret)
+    else:
+        print("[HealthSahayAI] FATAL: Python 3.8+ required. .venv not found.", flush=True)
+        print("[HealthSahayAI] Fix: run   .venv\\Scripts\\python.exe app.py", flush=True)
+        sys.exit(1)
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from datetime import datetime
 import json
@@ -85,7 +116,9 @@ def schemes():
     if session.get("user_id"):
         user = get_user_by_id(session["user_id"])
         if user:
-            profile = get_user_profile(user["id"])
+            profile = get_user_profile(user["id"]) or {"completion_pct": 20, "healthcare_needs": []}
+    if not isinstance(profile, dict) or "completion_pct" not in profile:
+        profile = {"completion_pct": 20, "healthcare_needs": []}
 
     assessment = session.get("scheme_assessment", {})
     return page("schemes.html", "schemes", "Find Healthcare Schemes for You",
@@ -382,7 +415,8 @@ def register():
             session["user_id"] = user_id
             session["user_name"] = name
             session["user_email"] = email
-            flash(f"Welcome, {name.split()[0]}! Your profile is just getting started. Account created successfully.", "info")
+            first_name = name.split()[0] if name else "Beneficiary"
+            flash(f"Welcome, {first_name}! Your profile is just getting started. Account created successfully.", "info")
             return redirect(url_for("profile_view"))
         else:
             flash("An error occurred creating your account. Please try again.", "error")
@@ -409,7 +443,8 @@ def login():
             session["user_id"] = user["id"]
             session["user_name"] = user["name"]
             session["user_email"] = user["email"]
-            flash(f"Welcome back, {user['name'].split()[0]}!", "info")
+            first_name = (user.get("name") or "").strip().split()[0] if (user.get("name") or "").strip() else "Beneficiary"
+            flash(f"Welcome back, {first_name}!", "info")
             if next_url and next_url.startswith("/"):
                 return redirect(next_url)
             return redirect(url_for("profile_view"))
@@ -443,7 +478,9 @@ def dashboard():
     if not user:
         session.clear()
         return redirect(url_for("login"))
-    profile = get_user_profile(user["id"])
+    profile = get_user_profile(user["id"]) or {"completion_pct": 20, "healthcare_needs": []}
+    if not isinstance(profile, dict) or "completion_pct" not in profile:
+        profile = {"completion_pct": 20, "healthcare_needs": []}
     recommendations = recommend_schemes_for_user(user, profile)
     recent_schemes = get_newly_launched_schemes(limit=6)
     return page("dashboard.html", "profile", "My Complete Profile",
@@ -460,7 +497,9 @@ def profile_view():
         session.clear()
         return redirect(url_for("login"))
 
-    profile = get_user_profile(user["id"])
+    profile = get_user_profile(user["id"]) or {"completion_pct": 20, "healthcare_needs": []}
+    if not isinstance(profile, dict) or "completion_pct" not in profile:
+        profile = {"completion_pct": 20, "healthcare_needs": []}
     return page("profile.html", "profile", "My Complete Profile",
                 user=user, profile=profile)
 
@@ -576,7 +615,9 @@ def recommended_schemes():
     if not user:
         session.clear()
         return redirect(url_for("login"))
-    profile = get_user_profile(user["id"])
+    profile = get_user_profile(user["id"]) or {"completion_pct": 20, "healthcare_needs": []}
+    if not isinstance(profile, dict) or "completion_pct" not in profile:
+        profile = {"completion_pct": 20, "healthcare_needs": []}
     assessment = session.get("scheme_assessment", {})
 
     # If scheme assessment was completed in session, prioritize its state and needs
@@ -1004,4 +1045,4 @@ def tracking():
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=True)
